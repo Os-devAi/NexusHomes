@@ -1,0 +1,67 @@
+{
+  "project_info": {
+    "project_number": "745495421824",
+    "project_id": "salamadatabase",
+    "storage_bucket": "salamadatabase.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:745495421824:android:7ad4de1fa4789bb4c55765",
+        "android_client_info": {
+          "package_name": "com.nexusdev.gymflow"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDZqE0hMQhgbgLDjtNQ0Y-Bq9Oyd9NYoIs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:745495421824:android:0cf1345861e70e39c55765",
+        "android_client_info": {
+          "package_name": "com.nexusdev.nexusbusiness"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDZqE0hMQhgbgLDjtNQ0Y-Bq9Oyd9NYoIs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:745495421824:android:713f823345104137c55765",
+        "android_client_info": {
+          "package_name": "com.nexusdev.nexushomes"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDZqE0hMQhgbgLDjtNQ0Y-Bq9Oyd9NYoIs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
