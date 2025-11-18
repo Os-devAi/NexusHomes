@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.nexusdev.nexushomes.ui.screens.HomeScreen
+import com.nexusdev.nexushomes.ui.screens.PublishScreen
 
 @Composable
 fun AppNavigation(
@@ -18,7 +19,10 @@ fun AppNavigation(
         startDestination = "home"
     ) {
         composable("home") {
-            HomeScreen(modifier = modifier)
+            HomeScreen(modifier = modifier, navController)
+        }
+        composable("addNew") {
+            PublishScreen(navController)
         }
     }
 }

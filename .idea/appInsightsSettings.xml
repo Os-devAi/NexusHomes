@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.nexusdev.nexushomes" />
+                  <option name="mobileSdkAppId" value="1:745495421824:android:713f823345104137c55765" />
+                  <option name="projectId" value="salamadatabase" />
+                  <option name="projectNumber" value="745495421824" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

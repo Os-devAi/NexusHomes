@@ -32,16 +32,20 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import androidx.navigation.Navigator
+import androidx.navigation.compose.rememberNavController
 import com.nexusdev.nexushomes.R
+import com.nexusdev.nexushomes.navigation.AppNavigation
 
 @Composable
 fun HomeScreen(
-    modifier: Modifier
+    modifier: Modifier,
+    navController: NavHostController
 ) {
     // variables of system
     val context = LocalContext.current
     val isDarkTheme = isSystemInDarkTheme()
-
 
     Column(
         modifier = Modifier
@@ -152,8 +156,7 @@ fun HomeScreen(
                         .clickable(
                             onClick = {
                                 // to upload a new post
-                                Toast.makeText(context, "Upload clicked", Toast.LENGTH_SHORT)
-                                    .show()
+                                navController.navigate("addNew")
                             }
                         )
                 )

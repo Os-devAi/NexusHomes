@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    id("com.google.gms.google-services")
+    id("kotlin-parcelize")
 }
 
 android {
@@ -64,4 +66,31 @@ dependencies {
     implementation("com.google.accompanist:accompanist-navigation-animation:0.36.0") // esta implementacion es para navegar entre pantallas con animaciones.
 
     implementation ("androidx.compose.foundation:foundation")
+
+    // percistencia de datos con datastore
+    implementation("androidx.datastore:datastore-preferences:1.1.7")
+
+
+    // implementacion de firebase
+    implementation(platform("com.google.firebase:firebase-bom:34.4.0"))
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-firestore-ktx:25.1.4")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.4")
+
+    // notificaciones firebase
+    implementation("com.google.firebase:firebase-messaging:25.0.1")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.9.4")
+
+    // Add the dependency for the Firebase Authentication library
+    // When using the BoM, you don't specify versions in Firebase library dependencies
+    implementation("com.google.firebase:firebase-auth")
+
+    // Add the dependency for the Cloud Storage library
+    // When using the BoM, you don't specify versions in Firebase library dependencies
+    implementation("com.google.firebase:firebase-storage")
+
+
+    // Para uso de imagenes de internet
+    implementation("io.coil-kt.coil3:coil-compose:3.3.0")
+    implementation("io.coil-kt.coil3:coil-network-okhttp:3.3.0")
 }
