@@ -50,7 +50,7 @@ fun HomeScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp)
+            .padding(horizontal = 8.dp)
             .verticalScroll(rememberScrollState())
     ) {
         // header section
@@ -63,7 +63,7 @@ fun HomeScreen(
             Row(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 16.dp),
+                    .padding(horizontal = 8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -96,15 +96,15 @@ fun HomeScreen(
         // end of header section
 
         // begin profile info section
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(75.dp)
-        ) {
+//        Card(
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .height(75.dp)
+//        ) {
             Row(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 16.dp),
+                    .padding(horizontal = 8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -121,13 +121,12 @@ fun HomeScreen(
                         )
                     }
                     Text(
-                        text = "ejemplo@email.com",
+                        text = "Encuentra tu hogar ideal",
                         style = MaterialTheme.typography.bodySmall
                     )
                 }
-
             }
-        }
+//        }
 
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -141,7 +140,7 @@ fun HomeScreen(
             Row(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 16.dp),
+                    .padding(horizontal = 8.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Image(
@@ -161,7 +160,12 @@ fun HomeScreen(
                         )
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Publicar")
+                Text(
+                    "Publicar",
+                    modifier = Modifier
+                        .clickable {
+                            navController.navigate("addNew")
+                        })
 
                 Spacer(modifier = Modifier.width(16.dp))
 

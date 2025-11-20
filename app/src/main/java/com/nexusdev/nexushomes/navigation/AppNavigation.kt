@@ -22,7 +22,7 @@ fun AppNavigation(
             HomeScreen(modifier = modifier, navController)
         }
         composable("addNew") {
-            PublishScreen(navController)
+            PublishScreen(navController, modifier)
         }
     }
 }

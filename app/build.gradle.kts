@@ -60,37 +60,31 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 
-    // Dependencia necesaria para la navegacion entre activitys
-    implementation("androidx.navigation:navigation-compose:2.9.5")
-    implementation("androidx.navigation:navigation-ui-ktx:2.9.5")
-    implementation("com.google.accompanist:accompanist-navigation-animation:0.36.0") // esta implementacion es para navegar entre pantallas con animaciones.
+    // Navigation - usa solo una versión consistente
+    implementation("androidx.navigation:navigation-compose:2.7.7")
 
-    implementation ("androidx.compose.foundation:foundation")
+    // Elimina estas dependencias conflictivas:
+    // implementation("androidx.navigation:navigation-ui-ktx:2.9.5") // CONFLICTO
+    // implementation("com.google.accompanist:accompanist-navigation-animation:0.36.0") // OBSOLETA
 
-    // percistencia de datos con datastore
-    implementation("androidx.datastore:datastore-preferences:1.1.7")
+    // foundation ya está incluida en compose-bom
+    // implementation ("androidx.compose.foundation:foundation")
 
+    // DataStore
+    implementation("androidx.datastore:datastore-preferences:1.1.0")
 
-    // implementacion de firebase
-    implementation(platform("com.google.firebase:firebase-bom:34.4.0"))
+    // Firebase
+    implementation(platform("com.google.firebase:firebase-bom:33.7.0")) // Versión más estable
     implementation("com.google.firebase:firebase-analytics")
-    implementation("com.google.firebase:firebase-firestore-ktx:25.1.4")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.4")
-
-    // notificaciones firebase
-    implementation("com.google.firebase:firebase-messaging:25.0.1")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.9.4")
-
-    // Add the dependency for the Firebase Authentication library
-    // When using the BoM, you don't specify versions in Firebase library dependencies
+    implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.firebase:firebase-auth")
-
-    // Add the dependency for the Cloud Storage library
-    // When using the BoM, you don't specify versions in Firebase library dependencies
     implementation("com.google.firebase:firebase-storage")
+    implementation("com.google.firebase:firebase-messaging")
 
+    // ViewModel
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.0")
 
-    // Para uso de imagenes de internet
-    implementation("io.coil-kt.coil3:coil-compose:3.3.0")
-    implementation("io.coil-kt.coil3:coil-network-okhttp:3.3.0")
+    // Coil - usa la versión actual
+    implementation("io.coil-kt:coil-compose:2.6.0")
 }

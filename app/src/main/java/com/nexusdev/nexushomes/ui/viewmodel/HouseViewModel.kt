@@ -18,6 +18,8 @@ class HouseViewModel : ViewModel() {
 
     val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+    val _message = MutableStateFlow("")
+    val message: StateFlow<String> = _message.asStateFlow()
 
 
     fun fetchHomes() {
@@ -32,7 +34,57 @@ class HouseViewModel : ViewModel() {
                         house.id = document.id
                         housesList.add(house)
                     }
+                    _houses.value = housesList
+                    _isLoading.value = false
+                }
+                .addOnFailureListener { exception ->
+                    _message.value = exception.message.toString()
+                    _isLoading.value = false
+                }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
 
+    // para obtener los detalles llamar por id
+    fun fetchById(id: String) {
+        try {
+            _isLoading.value = true
+            db.collection("homes")
+                .whereEqualTo("id", id)
+                .get()
+                .addOnSuccessListener { result ->
+                    val housesList = mutableListOf<HouseModel>()
+                    for (document in result) {
+                        val house = document.toObject(HouseModel::class.java)
+                        house.id = document.id
+                        housesList.add(house)
+                    }
+                    _houses.value = housesList
+                    _isLoading.value = false
+                }
+                .addOnFailureListener { exception ->
+                    _message.value = exception.message.toString()
+                    _isLoading.value = false
+                }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    // crear una nueva publicacieón
+    fun createHouse(house: HouseModel) {
+        try {
+            _isLoading.value = true
+            db.collection("homes")
+                .add(house)
+                .addOnSuccessListener { documentReference ->
+                    _message.value = "Publicación creada con ID: ${documentReference.id}"
+                    _isLoading.value = false
+                }
+                .addOnFailureListener { exception ->
+                    _message.value = exception.message.toString()
+                    _isLoading.value = false
                 }
         } catch (e: Exception) {
             e.printStackTrace()
