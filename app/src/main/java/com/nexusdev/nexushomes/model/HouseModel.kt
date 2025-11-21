@@ -13,3 +13,14 @@ data class HouseModel(
     val longitude: String? = null,
     val image: ArrayList<String>? = null
 )
+
+data class UiState(
+    // Usamos HouseModel como el modelo central del formulario
+    val propertyDetails: HouseModel = HouseModel(),
+
+    // URIs locales de las imágenes seleccionadas antes de la subida
+    val selectedImageUris: List<String> = emptyList(),
+
+    val isLoading: Boolean = false,
+    val userMessage: String? = null
+)

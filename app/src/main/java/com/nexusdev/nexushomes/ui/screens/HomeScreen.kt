@@ -101,37 +101,34 @@ fun HomeScreen(
 //                .fillMaxWidth()
 //                .height(75.dp)
 //        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column {
-                    Row {
-                        Text(
-                            text = "Bienvenido,",
-                            style = MaterialTheme.typography.titleMedium,
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = "Lamine Yamal",
-                            style = MaterialTheme.typography.titleMedium,
-                        )
-                    }
-                    Text(
-                        text = "Encuentra tu hogar ideal",
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                }
-            }
+//            Row(
+//                modifier = Modifier
+//                    .fillMaxSize()
+//                    .padding(horizontal = 8.dp),
+//                horizontalArrangement = Arrangement.SpaceBetween,
+//                verticalAlignment = Alignment.CenterVertically
+//            ) {
+//                Column {
+//                    Row {
+//                        Text(
+//                            text = "Bienvenido,",
+//                            style = MaterialTheme.typography.titleMedium,
+//                        )
+//                        Spacer(modifier = Modifier.width(8.dp))
+//                        Text(
+//                            text = "Lamine Yamal",
+//                            style = MaterialTheme.typography.titleMedium,
+//                        )
+//                    }
+//                    Text(
+//                        text = "Encuentra tu hogar ideal",
+//                        style = MaterialTheme.typography.bodySmall
+//                    )
+//                }
+//            }
 //        }
 
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // begin of upload section
+        // begin of upload section add condition for logged in users
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -213,5 +210,7 @@ fun HomeScreen(
             keyboardOptions = KeyboardOptions.Default
         )
 
+
+        // fetch houses to rent
     }
 }

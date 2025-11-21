@@ -87,4 +87,31 @@ dependencies {
 
     // Coil - usa la versión actual
     implementation("io.coil-kt:coil-compose:2.6.0")
+
+    // imagekit for storage images
+    implementation("com.github.imagekit-developer.imagekit-android:imagekit-android:3.0.1")
+    implementation("com.squareup.okhttp3:okhttp:4.10.0")
+    implementation("com.github.imagekit-developer.imagekit-android:imagekit-android:3.0.1")
+    implementation("com.github.imagekit-developer.imagekit-android:imagekit-glide-extension:3.0.1")
+    implementation("com.github.imagekit-developer.imagekit-android:imagekit-picasso-extension:3.0.1")
+    implementation("com.github.imagekit-developer.imagekit-android:imagekit-coil-extension:3.0.1")
+    implementation("com.github.imagekit-developer.imagekit-android:imagekit-fresco-extension:3.0.1")
+    implementation("com.facebook.fresco:nativeimagetranscoder") {
+        version {
+            strictly("2.6.0")
+        }
+    }
+
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+// Para el Logging (Debugging de peticiones)
+    implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
+// Conversor para manejar respuestas no-JSON (String/Scalars)
+    implementation("com.squareup.retrofit2:converter-scalars:2.9.0")
+
+// Para manejo de URIs locales y Streams
+    implementation("androidx.core:core-ktx:1.12.0")
+
+    // Corrutinas para integración con las tareas de Firebase
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
 }
