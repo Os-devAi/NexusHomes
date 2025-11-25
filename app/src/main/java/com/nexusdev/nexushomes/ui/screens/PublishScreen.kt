@@ -64,9 +64,8 @@ import com.nexusdev.nexushomes.utils.ImageKitRepository // Asume la implementaci
 class PublishViewModelFactory(private val context: Context) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(PublishViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            // Usamos context.applicationContext para evitar fugas de memoria
             val repository = ImageKitRepository(context.applicationContext)
+            @Suppress("UNCHECKED_CAST")
             return PublishViewModel(repository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
