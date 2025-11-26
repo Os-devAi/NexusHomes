@@ -57,30 +57,16 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.nexusdev.nexushomes.ui.viewmodel.PublishViewModel
+import com.nexusdev.nexushomes.ui.viewmodel.PublishViewModelFactory
 import com.nexusdev.nexushomes.utils.ImageKitRepository // Asume la implementación de Retrofit
-
-// 1. CORRECCIÓN DEL FACTORY
-// Ahora recibe el Context para inicializar ImageKitRepository correctamente
-class PublishViewModelFactory(private val context: Context) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(PublishViewModel::class.java)) {
-            val repository = ImageKitRepository(context.applicationContext)
-            @Suppress("UNCHECKED_CAST")
-            return PublishViewModel(repository) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
-    }
-}
 
 @Composable
 fun PublishScreen(
     navController: NavHostController,
     modifier: Modifier
 ) {
-    // 2. OBTENER EL CONTEXTO LOCAL
     val context = LocalContext.current
 
-    // 3. PASAR EL CONTEXTO AL FACTORY
     val viewModel: PublishViewModel = viewModel(
         factory = PublishViewModelFactory(context)
     )
@@ -303,25 +289,19 @@ fun PublishScreen(
 
                     // Botón de publicación
                     Button(
-                        onClick = viewModel::publishProperty,
+                        onClick = { viewModel.publishProperty() },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(50.dp),
-                        shape = RoundedCornerShape(12.dp),
-                        // Validación de habilitación mejorada
-                        enabled = !uiState.isLoading &&
-                                details.title.isNullOrBlank().not() &&
-                                details.price.isNullOrBlank().not() &&
-                                details.address.isNullOrBlank().not() &&
-                                selectedImageUris.isNotEmpty()
+                            .height(55.dp)
                     ) {
                         if (uiState.isLoading) {
                             CircularProgressIndicator(
-                                color = MaterialTheme.colorScheme.onPrimary,
+                                color = Color.White,
+                                strokeWidth = 2.dp,
                                 modifier = Modifier.size(24.dp)
                             )
                         } else {
-                            Text("Publicar Propiedad")
+                            Text("Publicar propiedad")
                         }
                     }
                 }

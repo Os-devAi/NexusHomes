@@ -1,6 +1,5 @@
 package com.nexusdev.nexushomes.ui.screens
 
-import android.graphics.fonts.Font
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -13,11 +12,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
@@ -26,39 +24,63 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.Navigator
-import androidx.navigation.compose.rememberNavController
 import com.nexusdev.nexushomes.R
-import com.nexusdev.nexushomes.navigation.AppNavigation
+import com.nexusdev.nexushomes.ui.components.HouseCard
+import com.nexusdev.nexushomes.ui.viewmodel.HomeDataViewModel
 
 @Composable
 fun HomeScreen(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     navController: NavHostController
 ) {
-    // variables of system
+    val viewModel: HomeDataViewModel = viewModel()
+
     val context = LocalContext.current
     val isDarkTheme = isSystemInDarkTheme()
 
+    // 📌 Observamos las casas desde el ViewModel
+    val houses by viewModel.houses.collectAsState()
+
+    // 📌 Estado de búsqueda
+    var searchQuery by remember { mutableStateOf("") }
+
+    // 📌 Filtrado dinámico
+    val filteredHouses = houses.filter { house ->
+        val query = searchQuery.lowercase()
+        house.title?.lowercase()?.contains(query) == true ||
+                house.address?.lowercase()?.contains(query) == true
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.fetchHomes()
+    }
+
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .padding(horizontal = 8.dp)
-            .verticalScroll(rememberScrollState())
     ) {
-        // header section
+
+        // Header — sin cambios
         Card(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 16.dp)
-                .height(80.dp),
+                .height(80.dp)
         ) {
             Row(
                 modifier = Modifier
@@ -68,149 +90,73 @@ fun HomeScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Nexus Homes",
+                    "Nexus Homes",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
 
                 Image(
-                    painter = if (isDarkTheme) {
-                        painterResource(id = R.drawable.outline_settings_ligth)
-                    } else {
-                        painterResource(id = R.drawable.outline_settings_dark)
-                    },
-                    contentDescription = "settings icon",
+                    painter = if (isDarkTheme)
+                        painterResource(R.drawable.outline_settings_ligth)
+                    else painterResource(R.drawable.outline_settings_dark),
+                    contentDescription = "settings",
                     modifier = Modifier
                         .height(24.dp)
-                        .clickable(
-                            onClick = {
-                                // navigate to settings screen
-                                Toast.makeText(context, "Settings clicked", Toast.LENGTH_SHORT)
-                                    .show()
-                            }
-                        )
-                )
-            }
-        }
-
-        // end of header section
-
-        // begin profile info section
-//        Card(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .height(75.dp)
-//        ) {
-//            Row(
-//                modifier = Modifier
-//                    .fillMaxSize()
-//                    .padding(horizontal = 8.dp),
-//                horizontalArrangement = Arrangement.SpaceBetween,
-//                verticalAlignment = Alignment.CenterVertically
-//            ) {
-//                Column {
-//                    Row {
-//                        Text(
-//                            text = "Bienvenido,",
-//                            style = MaterialTheme.typography.titleMedium,
-//                        )
-//                        Spacer(modifier = Modifier.width(8.dp))
-//                        Text(
-//                            text = "Lamine Yamal",
-//                            style = MaterialTheme.typography.titleMedium,
-//                        )
-//                    }
-//                    Text(
-//                        text = "Encuentra tu hogar ideal",
-//                        style = MaterialTheme.typography.bodySmall
-//                    )
-//                }
-//            }
-//        }
-
-        // begin of upload section add condition for logged in users
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(75.dp)
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Image(
-                    painter = if (isDarkTheme) {
-                        painterResource(id = R.drawable.outline_upload_ligth)
-                    } else {
-                        painterResource(id = R.drawable.outline_upload_dark)
-                    },
-                    contentDescription = "upload new icon",
-                    modifier = Modifier
-                        .height(24.dp)
-                        .clickable(
-                            onClick = {
-                                // to upload a new post
-                                navController.navigate("addNew")
-                            }
-                        )
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    "Publicar",
-                    modifier = Modifier
                         .clickable {
-                            navController.navigate("addNew")
-                        })
-
-                Spacer(modifier = Modifier.width(16.dp))
-
-                Image(
-                    painter = if (isDarkTheme) {
-                        painterResource(id = R.drawable.my_uploads_ligth)
-                    } else {
-                        painterResource(id = R.drawable.outline_upload_dark)
-                    },
-                    contentDescription = "my uploads icon",
-                    modifier = Modifier
-                        .height(24.dp)
-                        .clickable(
-                            onClick = {
-                                // to my uploads
-                                Toast.makeText(context, "My uploads clicked", Toast.LENGTH_SHORT)
-                                    .show()
-                            }
-                        )
+                            Toast.makeText(context, "Settings", Toast.LENGTH_SHORT).show()
+                        }
                 )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Mis publicaciones")
             }
         }
 
-        // end of upload section
+        Spacer(Modifier.height(12.dp))
 
-        // begin of body section
-        // Search Bar
-        OutlinedTextField(
-            value = "",
-            onValueChange = {},
-            placeholder = { Text("Buscar un inmueble...") },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = "Buscar"
-                )
-            },
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 12.dp),
-            shape = RoundedCornerShape(16.dp),
-            maxLines = 1,
-            keyboardOptions = KeyboardOptions.Default
-        )
+                .fillMaxSize()
+                .padding(horizontal = 8.dp)
+        ) {
 
+            // --------------------------------
+            // 🔍 SearchBar
+            // --------------------------------
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = { searchQuery = it },
+                placeholder = { Text("Buscar por título o dirección...") },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = "Buscar"
+                    )
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 12.dp),
+                shape = RoundedCornerShape(16.dp),
+                maxLines = 1
+            )
 
-        // fetch houses to rent
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // --------------------------------
+            // 🏡 GRID DE PROPIEDADES (2 columnas)
+            // --------------------------------
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.fillMaxSize()
+            ) {
+                items(filteredHouses) { house ->
+                    HouseCard(
+                        house = house,
+                        onClick = {
+//                            navController.navigate("detail/${house.id}")
+                        }
+                    )
+                }
+            }
+        }
     }
 }
