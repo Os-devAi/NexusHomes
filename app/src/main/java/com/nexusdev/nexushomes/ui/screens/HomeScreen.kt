@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -109,6 +110,38 @@ fun HomeScreen(
             }
         }
 
+
+        Spacer(Modifier.height(12.dp))
+
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(75.dp)
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Image(
+                    painter = if (isDarkTheme) {
+                        painterResource(id = R.drawable.outline_upload_ligth)
+                    } else {
+                        painterResource(id = R.drawable.outline_upload_dark)
+                    },
+                    contentDescription = "upload new icon",
+                    modifier = Modifier
+                        .height(24.dp)
+                        .clickable(onClick = { navController.navigate("addNew") })
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Publicar", modifier = Modifier.clickable {
+                    navController.navigate("addNew")
+                })
+            }
+        }
+
         Spacer(Modifier.height(12.dp))
 
         Column(
@@ -134,7 +167,8 @@ fun HomeScreen(
                     .fillMaxWidth()
                     .padding(top = 12.dp),
                 shape = RoundedCornerShape(16.dp),
-                maxLines = 1
+                maxLines = 1,
+                singleLine = true
             )
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -152,7 +186,7 @@ fun HomeScreen(
                     HouseCard(
                         house = house,
                         onClick = {
-//                            navController.navigate("detail/${house.id}")
+                            navController.navigate("detail/${house.id}")
                         }
                     )
                 }
