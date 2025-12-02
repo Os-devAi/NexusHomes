@@ -1,6 +1,7 @@
 package com.nexusdev.nexushomes.ui.screens
 
-import android.content.Context
+import android.Manifest
+import android.content.pm.PackageManager
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -30,6 +31,10 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -42,7 +47,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -51,14 +58,12 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.nexusdev.nexushomes.ui.viewmodel.PublishViewModel
 import com.nexusdev.nexushomes.ui.viewmodel.PublishViewModelFactory
-import com.nexusdev.nexushomes.utils.ImageKitRepository // Asume la implementación de Retrofit
 
 @Composable
 fun PublishScreen(
@@ -81,6 +86,20 @@ fun PublishScreen(
     ) { uri: Uri? ->
         uri?.let {
             viewModel.addSelectedImageUri(it.toString())
+        }
+    }
+
+    // para location
+    // 1. Define el Launcher para la solicitud de permisos
+    val locationPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            // Permiso concedido: llama inmediatamente a la función de obtención de ubicación
+            viewModel.getCurrentLocation(context)
+        } else {
+            // Permiso denegado: informa al usuario
+            viewModel.showSnackbar("Permiso de ubicación denegado. No se puede obtener la posición actual.")
         }
     }
 
@@ -191,14 +210,19 @@ fun PublishScreen(
                     Spacer(modifier = Modifier.height(12.dp))
 
                     // Tipo de propiedad
-                    OutlinedTextField(
-                        value = details.type ?: "",
-                        onValueChange = { viewModel.updateField(it, "type") },
-                        label = { Text("Tipo de propiedad") },
-                        placeholder = { Text("Ej: Casa, Apartamento, Villa, etc.") },
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
-                        singleLine = true
+//                    OutlinedTextField(
+//                        value = details.type ?: "",
+//                        onValueChange = { viewModel.updateField(it, "type") },
+//                        label = { Text("Tipo de propiedad") },
+//                        placeholder = { Text("Ej: Casa, Apartamento, Villa, etc.") },
+//                        modifier = Modifier.fillMaxWidth(),
+//                        shape = RoundedCornerShape(12.dp),
+//                        singleLine = true
+//                    )
+
+                    TipoPropiedadSelector(
+                        currentType = details.type,
+                        onTypeSelected = { viewModel.updateField(it, "type") }
                     )
 
                     Spacer(modifier = Modifier.height(12.dp))
@@ -284,6 +308,57 @@ fun PublishScreen(
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                         )
                     }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+// --- NUEVA SECCIÓN: Selección de Coordenadas ---
+                    Text(
+                        text = "Coordenadas GPS",
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Button(
+                            onClick = {
+                                // Lógica: 1. Verifica si el permiso existe
+                                if (ContextCompat.checkSelfPermission(
+                                        context,
+                                        Manifest.permission.ACCESS_FINE_LOCATION
+                                    ) == PackageManager.PERMISSION_GRANTED
+                                ) {
+                                    // Permiso ya concedido: Ejecuta la lógica directamente
+                                    viewModel.getCurrentLocation(context)
+                                } else {
+                                    // Permiso no concedido: Solicita el permiso
+                                    locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                                }
+                                viewModel.getCurrentLocation(context)
+                            },
+                            // Deshabilita si está cargando o si la ubicación ya fue obtenida/seleccionada
+                            enabled = !uiState.isLoading,
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text("Ubicación Actual")
+                        }
+
+                        /*Button(
+                            onClick = {
+                                // Navegación a la pantalla del mapa
+                                // Debes definir la ruta para la pantalla de selección de mapa (ej: "select_map")
+                                // navController.navigate("select_map")
+                                viewModel.showSnackbar("Función Seleccionar en Mapa (requiere integración con Google Maps o similar)")
+                            },
+                            enabled = !uiState.isLoading,
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text("Seleccionar en Mapa")
+                        }*/
+                    }
+                    Spacer(modifier = Modifier.height(12.dp))
 
                     Spacer(modifier = Modifier.height(20.dp))
 
@@ -408,6 +483,70 @@ fun SelectedImagePreview(
                 tint = Color.White,
                 modifier = Modifier.size(12.dp)
             )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TipoPropiedadSelector(
+    currentType: String?,
+    onTypeSelected: (String) -> Unit
+) {
+    // 1. Lista de opciones disponibles
+    val propertyTypes =
+        listOf("Casa", "Apartamento", "Habitación", "Lote", "Local Comercial", "Oficina")
+
+    // 2. Estado para controlar si el menú desplegable está expandido
+    var expanded by remember { mutableStateOf(false) }
+
+    // 3. Texto visible: usa el valor seleccionado o un texto predeterminado
+    val selectedText = currentType ?: ""
+
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = {
+            expanded = !expanded
+        },
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        // El OutlinedTextField sirve como el contenedor visible
+        OutlinedTextField(
+            // El modificador 'menuAnchor' es necesario para Compose 1.5+
+            modifier = Modifier
+                .fillMaxWidth()
+                .menuAnchor(),
+            readOnly = true, // No permite escribir, solo seleccionar
+            value = selectedText,
+            onValueChange = {}, // No se usa ya que es de solo lectura
+            label = { Text("Tipo de propiedad") },
+            trailingIcon = {
+                ExposedDropdownMenuDefaults.TrailingIcon(
+                    expanded = expanded
+                )
+            },
+            placeholder = { Text("Selecciona el tipo...") },
+            shape = RoundedCornerShape(12.dp),
+            colors = ExposedDropdownMenuDefaults.textFieldColors(),
+        )
+
+        // El menú desplegable que aparece al hacer clic
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = {
+                expanded = false
+            }
+        ) {
+            propertyTypes.forEach { selectionOption ->
+                DropdownMenuItem(
+                    text = { Text(selectionOption) },
+                    onClick = {
+                        onTypeSelected(selectionOption) // Notifica al ViewModel la selección
+                        expanded = false // Cierra el menú después de seleccionar
+                    },
+                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+                )
+            }
         }
     }
 }

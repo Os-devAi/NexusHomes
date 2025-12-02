@@ -1,5 +1,7 @@
 package com.nexusdev.nexushomes.ui.viewmodel
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
@@ -8,6 +10,11 @@ import android.os.Build
 import android.provider.MediaStore
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.core.content.ContextCompat
+import android.content.pm.PackageManager
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
+import com.google.android.gms.tasks.CancellationTokenSource
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.nexusdev.nexushomes.model.HouseModel
@@ -21,6 +28,7 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
 import java.util.UUID
+import kotlinx.coroutines.flow.update
 
 class PublishViewModel(
     private val context: Context
@@ -35,6 +43,65 @@ class PublishViewModel(
 
     fun dismissMessage() {
         _uiState.value = _uiState.value.copy(userMessage = null)
+    }
+
+    // funcion para obtener la localizacion de google maps
+    @SuppressLint("MissingPermission")
+    fun getCurrentLocation(context: Context) {
+        // 1. Verificar Permisos
+        if (ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            // No tienes permisos.
+            // Aquí debes solicitar los permisos usando un ActivityResultLauncher en tu Activity o Composable principal.
+            // Para fines de la UI, puedes mostrar un mensaje:
+            showSnackbar("Permiso de Ubicación requerido para obtener la posición actual.")
+            return
+        }
+
+        // Ejecutar en coroutine para no bloquear UI
+        viewModelScope.launch {
+            try {
+                val fused = LocationServices.getFusedLocationProviderClient(context)
+
+                // 1) Intentar lastLocation rápido
+                val lastLocation = try {
+                    fused.lastLocation.await()
+                } catch (e: Exception) {
+                    null
+                }
+
+                val location = lastLocation ?: run {
+                    // 2) Si lastLocation es null, pedir una ubicación actual de alta precisión (una sola lectura)
+                    val cts = CancellationTokenSource()
+                    try {
+                        fused.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, cts.token).await()
+                    } finally {
+                        // asegurarnos de cancelar el token si la coroutine termina
+                        cts.cancel()
+                    }
+                }
+
+                if (location != null) {
+                    // Actualizar campos con lat / lon reales
+                    updateField(location.latitude.toString(), "latitude")
+                    updateField(location.longitude.toString(), "longitude")
+                    showSnackbar("Ubicación obtenida correctamente.")
+                } else {
+                    // Puede que el GPS esté apagado o no haya señal; informar al usuario
+                    showSnackbar("No se pudo obtener la ubicación. Verifica que el GPS esté activado.")
+                }
+            } catch (e: Exception) {
+                // Manejo de errores (por ejemplo Settings no correctos, timeouts, etc.)
+                showSnackbar("Error al obtener ubicación: ${e.localizedMessage ?: e.message}")
+            }
+        }
+    }
+
+    fun showSnackbar(message: String) {
+        _uiState.update { it.copy(userMessage = message) }
     }
 
     // ----------------------------
