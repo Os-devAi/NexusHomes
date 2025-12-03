@@ -61,20 +61,15 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 
     // Navigation - usa solo una versión consistente
-    implementation("androidx.navigation:navigation-compose:2.7.7")
+    implementation("androidx.navigation:navigation-compose:2.9.6")
 
-    // Elimina estas dependencias conflictivas:
-    // implementation("androidx.navigation:navigation-ui-ktx:2.9.5") // CONFLICTO
-    // implementation("com.google.accompanist:accompanist-navigation-animation:0.36.0") // OBSOLETA
-
-    // foundation ya está incluida en compose-bom
-    // implementation ("androidx.compose.foundation:foundation")
+    implementation("androidx.compose.material:material-icons-extended:1.7.8") // Use the latest stable version
 
     // DataStore
-    implementation("androidx.datastore:datastore-preferences:1.1.0")
+    implementation("androidx.datastore:datastore-preferences:1.2.0")
 
     // Firebase
-    implementation(platform("com.google.firebase:firebase-bom:33.7.0")) // Versión más estable
+    implementation(platform("com.google.firebase:firebase-bom:34.6.0")) // Versión más estable
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.firebase:firebase-auth")
@@ -82,39 +77,25 @@ dependencies {
     implementation("com.google.firebase:firebase-messaging")
 
     // para google maps
-    implementation("com.google.android.gms:play-services-location:21.0.1")
+    implementation("com.google.android.gms:play-services-location:21.3.0")
 
     // ViewModel
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.10.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.10.0")
 
     // Coil - usa la versión actual
-    implementation("io.coil-kt:coil-compose:2.6.0")
+    implementation("io.coil-kt:coil-compose:2.7.0")
 
-    // imagekit for storage images
-    implementation("com.github.imagekit-developer.imagekit-android:imagekit-android:3.0.1")
-    implementation("com.squareup.okhttp3:okhttp:4.10.0")
-    implementation("com.github.imagekit-developer.imagekit-android:imagekit-android:3.0.1")
-    implementation("com.github.imagekit-developer.imagekit-android:imagekit-glide-extension:3.0.1")
-    implementation("com.github.imagekit-developer.imagekit-android:imagekit-picasso-extension:3.0.1")
-    implementation("com.github.imagekit-developer.imagekit-android:imagekit-coil-extension:3.0.1")
-    implementation("com.github.imagekit-developer.imagekit-android:imagekit-fresco-extension:3.0.1")
-    implementation("com.facebook.fresco:nativeimagetranscoder") {
-        version {
-            strictly("2.6.0")
-        }
-    }
-
-    implementation("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.retrofit2:retrofit:3.0.0")
+    implementation("com.squareup.retrofit2:converter-gson:3.0.0")
 // Para el Logging (Debugging de peticiones)
-    implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:5.3.2")
 // Conversor para manejar respuestas no-JSON (String/Scalars)
-    implementation("com.squareup.retrofit2:converter-scalars:2.9.0")
+    implementation("com.squareup.retrofit2:converter-scalars:3.0.0")
 
 // Para manejo de URIs locales y Streams
-    implementation("androidx.core:core-ktx:1.12.0")
+    implementation("androidx.core:core-ktx:1.17.0")
 
     // Corrutinas para integración con las tareas de Firebase
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.10.2")
 }
