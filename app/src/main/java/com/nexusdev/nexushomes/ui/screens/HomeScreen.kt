@@ -5,6 +5,7 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,6 +20,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -86,8 +88,8 @@ fun HomeScreen(
     val houses by viewModel.houses.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     var searchQuery by remember { mutableStateOf("") }
-    var selectedFilter by remember { mutableIntStateOf(0) } // 0: Todos, 1: Casas, 2: Apartamentos, 3: Terrenos
-    var sortOption by remember { mutableIntStateOf(0) } // 0: Más recientes, 1: Precio menor, 2: Precio mayor
+    var selectedFilter by remember { mutableIntStateOf(0) }
+    var sortOption by remember { mutableIntStateOf(0) }
     var showFilterMenu by remember { mutableStateOf(false) }
     var showSortMenu by remember { mutableStateOf(false) }
 
@@ -306,7 +308,7 @@ fun HomeScreen(
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 20.dp, vertical = 8.dp)
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
                             .shadow(
                                 elevation = 6.dp,
                                 shape = RoundedCornerShape(16.dp),
@@ -321,7 +323,7 @@ fun HomeScreen(
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 16.dp, vertical = 8.dp),
+                                .padding(horizontal = 8.dp, vertical = 8.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Icon(
@@ -350,7 +352,7 @@ fun HomeScreen(
                             )
 
                             // Botón de filtros
-                            Box {
+                            /*Box {
                                 IconButton(
                                     onClick = { showFilterMenu = true },
                                     modifier = Modifier
@@ -427,7 +429,7 @@ fun HomeScreen(
                                         )
                                     }
                                 }
-                            }
+                            }*/
                         }
                     }
 
@@ -451,7 +453,7 @@ fun HomeScreen(
                             )
 
                             // Botón de ordenamiento
-                            Box {
+                            /*Box {
                                 Surface(
                                     modifier = Modifier
                                         .clip(RoundedCornerShape(12.dp))
@@ -527,21 +529,21 @@ fun HomeScreen(
                                         )
                                     }
                                 }
-                            }
+                            }*/
                         }
 
                         Spacer(modifier = Modifier.height(12.dp))
 
                         // Chips de filtro rápido
                         Row(
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier.fillMaxWidth()
+                                .horizontalScroll(state = rememberScrollState()),
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             val filterTypes = listOf(
                                 "Todas" to Icons.Default.LocationOn,
                                 "Casas" to Icons.Default.LocationOn,
-                                "Apartamentos" to Icons.Default.LocationOn,
-                                "Terrenos" to Icons.Default.LocationOn
+                                "Apartamentos" to Icons.Default.LocationOn
                             )
 
                             filterTypes.forEachIndexed { index, (type, icon) ->
@@ -555,18 +557,11 @@ fun HomeScreen(
                                     shadowElevation = if (selectedFilter == index) 4.dp else 0.dp
                                 ) {
                                     Row(
-                                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+                                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 10.dp)
+                                            .fillMaxWidth(),
                                         verticalAlignment = Alignment.CenterVertically,
                                         horizontalArrangement = Arrangement.Center
                                     ) {
-                                        Icon(
-                                            imageVector = icon,
-                                            contentDescription = type,
-                                            tint = if (selectedFilter == index) MaterialTheme.colorScheme.onPrimary
-                                            else MaterialTheme.colorScheme.onSurfaceVariant,
-                                            modifier = Modifier.size(14.dp)
-                                        )
-                                        Spacer(modifier = Modifier.width(6.dp))
                                         Text(
                                             text = type,
                                             style = MaterialTheme.typography.labelSmall.copy(
