@@ -26,7 +26,7 @@ class AuthViewModel : ViewModel() {
 
     fun getGoogleSignInClient(context: Context): GoogleSignInClient {
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken("")
+            .requestIdToken("745495421824-ciq720856i7gej6rs372l2atusjlggdf.apps.googleusercontent.com")
             .requestEmail()
             .build()
 
