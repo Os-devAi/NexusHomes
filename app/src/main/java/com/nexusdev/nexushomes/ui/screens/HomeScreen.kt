@@ -73,6 +73,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
+import com.google.firebase.auth.FirebaseAuth
 import com.nexusdev.nexushomes.R
 import com.nexusdev.nexushomes.ui.viewmodel.HomeDataViewModel
 
@@ -83,6 +84,9 @@ fun HomeScreen(
 ) {
     val viewModel: HomeDataViewModel = viewModel()
     val context = LocalContext.current
+
+    val firebaseAuth = FirebaseAuth.getInstance()
+    val user = firebaseAuth.currentUser
 
     // 📌 Estados
     val houses by viewModel.houses.collectAsState()
@@ -124,7 +128,15 @@ fun HomeScreen(
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { navController.navigate("addNew") },
+                onClick = {
+                    if (user != null) {
+                        navController.navigate("addNew")
+                    } else {
+                        Toast.makeText(context, "Inicia sesión para publicar", Toast.LENGTH_SHORT)
+                            .show()
+                        navController.navigate("login")
+                    }
+                },
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary,
                 shape = CircleShape,
@@ -228,7 +240,8 @@ fun HomeScreen(
                             // Botón de configuración
                             IconButton(
                                 onClick = {
-                                    Toast.makeText(context, "Configuración", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, "Configuración", Toast.LENGTH_SHORT)
+                                        .show()
                                 },
                                 modifier = Modifier
                                     .size(48.dp)
@@ -536,7 +549,8 @@ fun HomeScreen(
 
                         // Chips de filtro rápido
                         Row(
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier
+                                .fillMaxWidth()
                                 .horizontalScroll(state = rememberScrollState()),
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
@@ -557,7 +571,11 @@ fun HomeScreen(
                                     shadowElevation = if (selectedFilter == index) 4.dp else 0.dp
                                 ) {
                                     Row(
-                                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 10.dp)
+                                        modifier = Modifier
+                                            .padding(
+                                                horizontal = 8.dp,
+                                                vertical = 10.dp
+                                            )
                                             .fillMaxWidth(),
                                         verticalAlignment = Alignment.CenterVertically,
                                         horizontalArrangement = Arrangement.Center

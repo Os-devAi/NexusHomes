@@ -8,6 +8,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.nexusdev.nexushomes.ui.screens.HomeScreen
 import com.nexusdev.nexushomes.ui.screens.HouseDetailScreen
+import com.nexusdev.nexushomes.ui.screens.LoginScreen
 import com.nexusdev.nexushomes.ui.screens.PublishScreen
 import com.nexusdev.nexushomes.ui.viewmodel.HomeDataViewModel
 
@@ -31,6 +32,9 @@ fun AppNavigation(
         }
         composable("addNew") {
             PublishScreen(navController, modifier)
+        }
+        composable ("login") {
+            LoginScreen(modifier, navController)
         }
     }
 }
