@@ -3,6 +3,7 @@
 package com.nexusdev.nexushomes.ui.viewmodel
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -25,6 +26,21 @@ class AuthViewModel : ViewModel() {
     val authState: StateFlow<AuthState> = _authState
 
     fun getGoogleSignInClient(context: Context): GoogleSignInClient {
+        // Add this debug log
+        Log.d("DEBUG_CONFIG", "Using Client ID: 745495421824-ciq720856i7gej6rs372l2atusjlggdf.apps.googleusercontent.com")
+
+        // Also check what's in your google-services.json
+        try {
+            val resources = context.resources
+            val packageName = context.packageName
+            val webClientId = resources.getString(
+                resources.getIdentifier("default_web_client_id", "string", packageName)
+            )
+            Log.d("DEBUG_CONFIG", "From google-services.json: $webClientId")
+        } catch (e: Exception) {
+            Log.e("DEBUG_CONFIG", "Could not read from google-services.json: ${e.message}")
+        }
+
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken("745495421824-ciq720856i7gej6rs372l2atusjlggdf.apps.googleusercontent.com")
             .requestEmail()

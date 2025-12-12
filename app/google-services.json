@@ -12,7 +12,12 @@
           "package_name": "com.nexusdev.gymflow"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "745495421824-ciq720856i7gej6rs372l2atusjlggdf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDZqE0hMQhgbgLDjtNQ0Y-Bq9Oyd9NYoIs"
@@ -20,7 +25,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "745495421824-ciq720856i7gej6rs372l2atusjlggdf.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "745495421824-32mp7k1v0q867jl10nb0a8isp72e9iue.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.nexusdev.Nexus-Business"
+              }
+            }
+          ]
         }
       }
     },
@@ -31,7 +48,12 @@
           "package_name": "com.nexusdev.nexusbusiness"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "745495421824-ciq720856i7gej6rs372l2atusjlggdf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDZqE0hMQhgbgLDjtNQ0Y-Bq9Oyd9NYoIs"
@@ -39,7 +61,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "745495421824-ciq720856i7gej6rs372l2atusjlggdf.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "745495421824-32mp7k1v0q867jl10nb0a8isp72e9iue.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.nexusdev.Nexus-Business"
+              }
+            }
+          ]
         }
       }
     },
@@ -50,7 +84,20 @@
           "package_name": "com.nexusdev.nexushomes"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "745495421824-iv92t4b5jn4fbroj1eqideunv1mcmd86.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.nexusdev.nexushomes",
+            "certificate_hash": "6febbabfd5186e092d6c41a3d103e89e02fd2a95"
+          }
+        },
+        {
+          "client_id": "745495421824-ciq720856i7gej6rs372l2atusjlggdf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDZqE0hMQhgbgLDjtNQ0Y-Bq9Oyd9NYoIs"
@@ -58,7 +105,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "745495421824-ciq720856i7gej6rs372l2atusjlggdf.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "745495421824-32mp7k1v0q867jl10nb0a8isp72e9iue.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.nexusdev.Nexus-Business"
+              }
+            }
+          ]
         }
       }
     }

@@ -123,6 +123,7 @@ fun HomeScreen(
     // 📌 Cargar datos
     LaunchedEffect(Unit) {
         viewModel.fetchHomes()
+        Toast.makeText(context, "Usuario: ${user?.email ?: "Invitado"}", Toast.LENGTH_SHORT).show()
     }
 
     Scaffold(

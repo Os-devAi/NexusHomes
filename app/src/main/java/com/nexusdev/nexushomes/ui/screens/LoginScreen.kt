@@ -65,7 +65,7 @@ fun LoginScreen(
                 is AuthState.Authenticated -> {
                     // Navegar a home cuando el usuario esté autenticado
                     navController.navigate("home") {
-                        popUpTo("onboarding") { inclusive = true }
+                        popUpTo("login") { inclusive = true }
                     }
                 }
 
