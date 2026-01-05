@@ -79,8 +79,7 @@ import com.nexusdev.nexushomes.ui.viewmodel.HomeDataViewModel
 
 @Composable
 fun HomeScreen(
-    modifier: Modifier = Modifier,
-    navController: NavHostController
+    modifier: Modifier = Modifier, navController: NavHostController
 ) {
     val viewModel: HomeDataViewModel = viewModel()
     val context = LocalContext.current
@@ -101,9 +100,8 @@ fun HomeScreen(
     val filteredHouses = remember(houses, searchQuery, selectedFilter, sortOption) {
         var filtered = houses.filter { house ->
             val query = searchQuery.lowercase()
-            house.title?.lowercase()?.contains(query) == true ||
-                    house.address?.lowercase()?.contains(query) == true ||
-                    house.description?.lowercase()?.contains(query) == true
+            house.title?.lowercase()?.contains(query) == true || house.address?.lowercase()
+                ?.contains(query) == true || house.description?.lowercase()?.contains(query) == true
         }
 
         // Aplicar filtro por tipo
@@ -135,7 +133,7 @@ fun HomeScreen(
                     } else {
                         Toast.makeText(context, "Inicia sesión para publicar", Toast.LENGTH_SHORT)
                             .show()
-                        navController.navigate("login")
+                        navController.navigate("phoneLogin")
                     }
                 },
                 containerColor = MaterialTheme.colorScheme.primary,
@@ -151,8 +149,7 @@ fun HomeScreen(
                     modifier = Modifier.size(28.dp)
                 )
             }
-        },
-        containerColor = MaterialTheme.colorScheme.background
+        }, containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
         Crossfade(targetState = isLoading, label = "Loading transition") { loading ->
             if (loading) {
@@ -224,8 +221,7 @@ fun HomeScreen(
                                                 append("Nexus")
                                             }
                                             append("Homes")
-                                        },
-                                        style = MaterialTheme.typography.headlineSmall.copy(
+                                        }, style = MaterialTheme.typography.headlineSmall.copy(
                                             fontWeight = FontWeight.Bold
                                         )
                                     )
@@ -304,8 +300,7 @@ fun HomeScreen(
                                                     )
                                                 )
                                             }
-                                        }
-                                    ) {
+                                        }) {
                                         Icon(
                                             imageVector = Icons.Filled.LocationOn,
                                             contentDescription = "Propiedades encontradas",
@@ -324,9 +319,7 @@ fun HomeScreen(
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp, vertical = 8.dp)
                             .shadow(
-                                elevation = 6.dp,
-                                shape = RoundedCornerShape(16.dp),
-                                clip = true
+                                elevation = 6.dp, shape = RoundedCornerShape(16.dp), clip = true
                             ),
                         colors = CardDefaults.cardColors(
                             containerColor = MaterialTheme.colorScheme.surface
@@ -569,13 +562,11 @@ fun HomeScreen(
                                         .weight(1f),
                                     color = if (selectedFilter == index) MaterialTheme.colorScheme.primary
                                     else MaterialTheme.colorScheme.surfaceVariant,
-                                    shadowElevation = if (selectedFilter == index) 4.dp else 0.dp
-                                ) {
+                                    shadowElevation = if (selectedFilter == index) 4.dp else 0.dp) {
                                     Row(
                                         modifier = Modifier
                                             .padding(
-                                                horizontal = 8.dp,
-                                                vertical = 10.dp
+                                                horizontal = 8.dp, vertical = 10.dp
                                             )
                                             .fillMaxWidth(),
                                         verticalAlignment = Alignment.CenterVertically,
@@ -650,14 +641,11 @@ fun HomeScreen(
                             content = {
                                 items(filteredHouses) { house ->
                                     ModernHouseCard(
-                                        house = house,
-                                        onClick = {
+                                        house = house, onClick = {
                                             navController.navigate("detail/${house.id}")
-                                        }
-                                    )
+                                        })
                                 }
-                            }
-                        )
+                            })
                     }
                 }
             }
@@ -667,8 +655,7 @@ fun HomeScreen(
 
 @Composable
 fun ModernHouseCard(
-    house: com.nexusdev.nexushomes.model.HouseModel,
-    onClick: () -> Unit
+    house: com.nexusdev.nexushomes.model.HouseModel, onClick: () -> Unit
 ) {
     Card(
         modifier = Modifier
@@ -676,9 +663,7 @@ fun ModernHouseCard(
             .height(280.dp)
             .clickable(onClick = onClick)
             .shadow(
-                elevation = 4.dp,
-                shape = RoundedCornerShape(20.dp),
-                clip = true
+                elevation = 4.dp, shape = RoundedCornerShape(20.dp), clip = true
             ),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
@@ -714,8 +699,7 @@ fun ModernHouseCard(
                         .background(
                             brush = Brush.verticalGradient(
                                 colors = listOf(
-                                    Color.Black.copy(alpha = 0.4f),
-                                    Color.Transparent
+                                    Color.Black.copy(alpha = 0.4f), Color.Transparent
                                 )
                             )
                         )
@@ -737,8 +721,7 @@ fun ModernHouseCard(
                         Text(
                             text = house.type?.take(4) ?: "PROP",
                             style = MaterialTheme.typography.labelSmall.copy(
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 10.sp
+                                fontWeight = FontWeight.Bold, fontSize = 10.sp
                             ),
                             color = MaterialTheme.colorScheme.onPrimary,
                             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
@@ -761,8 +744,7 @@ fun ModernHouseCard(
                         Text(
                             text = "Q${house.price}",
                             style = MaterialTheme.typography.labelMedium.copy(
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 13.sp
+                                fontWeight = FontWeight.Bold, fontSize = 13.sp
                             ),
                             color = MaterialTheme.colorScheme.onSecondary,
                             modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)

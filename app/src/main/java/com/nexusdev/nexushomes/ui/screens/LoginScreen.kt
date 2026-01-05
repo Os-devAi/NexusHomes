@@ -1,5 +1,3 @@
-@file:Suppress("DEPRECATION")
-
 package com.nexusdev.nexushomes.ui.screens
 
 import android.util.Log
@@ -12,12 +10,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,30 +47,25 @@ fun LoginScreen(
     onStartGoogleSignIn: (((String?) -> Unit) -> Unit)? = null
 ) {
 
-    //aux variables
-    var sizeImage by remember { mutableStateOf(IntSize.Zero) }
     val authViewModel: AuthViewModel = viewModel()
+    val authState by authViewModel.authState.collectAsState()
     val context = LocalContext.current
-    val gradient = Brush.verticalGradient(
-        colors = listOf(Color.Transparent, Color.White),
-        startY = sizeImage.height.toFloat() / 3,  // 1/3
-        endY = sizeImage.height.toFloat()
-    )
 
-
-    // init activity to show if logged in
-    LaunchedEffect(authViewModel.authState) {
+    // Reaccionar a cambios de estado
+    LaunchedEffect(authState) {
         authViewModel.authState.collect { authState ->
+            Log.d("Login Screen", "Auth state: $authState")
             when (authState) {
                 is AuthState.Authenticated -> {
+                    Log.d("LoginScreen", "User authenticated, navigating to home")
                     // Navegar a home cuando el usuario esté autenticado
-                    navController.navigate("home") {
+                    navController.navigate("addNew") {
                         popUpTo("login") { inclusive = true }
                     }
                 }
 
                 is AuthState.Error -> {
-                    Log.e("OnBoardingOne", "Authentication error: ${authState.message}")
+                    Log.e("LoginScreen", "Authentication error: ${authState.message}")
                     // Aquí podrías mostrar un Snackbar con el error
                 }
 
@@ -81,82 +76,76 @@ fun LoginScreen(
         }
     }
 
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
+    Box(modifier = Modifier.fillMaxSize()) {
+
         Image(
             painter = painterResource(R.drawable.background_login),
-            contentDescription = "Just a background for login",
+            contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
         )
+
         Column(
-            modifier = modifier
-                .fillMaxSize()
+            modifier = modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
+
             Spacer(modifier = Modifier.weight(1f))
 
-            // Google Sign-In Button
             Button(
                 onClick = {
+                    Log.d("LoginScreen", "Google Sign-In button clicked")
+
                     if (onStartGoogleSignIn != null) {
                         // Usar el callback proporcionado por MainActivity
                         onStartGoogleSignIn { idToken ->
                             if (idToken != null) {
                                 Log.d(
-                                    "OnBoardingOne",
+                                    "LoginScreen",
                                     "Received ID token, signing in with Firebase"
                                 )
                                 authViewModel.signInWithGoogle(idToken)
                             } else {
-                                Log.e("OnBoardingOne", "Failed to get ID token")
+                                Log.e("LoginScreen", "Failed to get ID token")
                             }
                         }
                     } else {
                         // Fallback: método antiguo (puede que no funcione bien)
-                        Log.w("OnBoardingOne", "Using fallback Google Sign-In method")
+                        Log.w("LoginScreen", "Using fallback Google Sign-In method")
                         try {
                             val signInIntent =
                                 authViewModel.getGoogleSignInClient(context).signInIntent
                             val activity = context as? androidx.activity.ComponentActivity
                             activity?.startActivityForResult(signInIntent, 9001)
                         } catch (e: Exception) {
-                            Log.e("OnBoardingOne", "Fallback method failed: ${e.message}")
+                            Log.e("LoginScreen", "Fallback method failed: ${e.message}")
                         }
                     }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 32.dp, vertical = 16.dp),
+                    .padding(32.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color.White,
-                    contentColor = Color.Gray
-                ),
-                elevation = ButtonDefaults.buttonElevation(
-                    defaultElevation = 4.dp,
-                    pressedElevation = 8.dp
+                    contentColor = Color.Black
                 )
             ) {
-                // Google icon (you might want to use a proper Google icon resource)
                 Image(
-                    painter = painterResource(id = R.drawable.google_icon),
-                    contentDescription = "Google icon",
-                    modifier = Modifier
-                        .width(24.dp)
-                        .height(24.dp)
+                    painter = painterResource(R.drawable.google_icon),
+                    contentDescription = null,
+                    modifier = Modifier.size(24.dp)
                 )
-
                 Spacer(modifier = Modifier.width(12.dp))
+                Text("Continuar con Google")
+            }
 
-                Text(
-                    text = "Continuar con google",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = Color.Black
-                )
+            if (authState is AuthState.Loading) {
+                Spacer(modifier = Modifier.height(16.dp))
+                Text("Iniciando sesión…")
             }
 
             Spacer(modifier = Modifier.height(32.dp))
         }
     }
 }
+

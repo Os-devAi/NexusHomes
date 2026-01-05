@@ -1,9 +1,6 @@
-@file:Suppress("DEPRECATION")
-
 package com.nexusdev.nexushomes.ui.viewmodel
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -25,22 +22,8 @@ class AuthViewModel : ViewModel() {
     private val _authState = MutableStateFlow<AuthState>(AuthState.Loading)
     val authState: StateFlow<AuthState> = _authState
 
+
     fun getGoogleSignInClient(context: Context): GoogleSignInClient {
-        // Add this debug log
-        Log.d("DEBUG_CONFIG", "Using Client ID: 745495421824-ciq720856i7gej6rs372l2atusjlggdf.apps.googleusercontent.com")
-
-        // Also check what's in your google-services.json
-        try {
-            val resources = context.resources
-            val packageName = context.packageName
-            val webClientId = resources.getString(
-                resources.getIdentifier("default_web_client_id", "string", packageName)
-            )
-            Log.d("DEBUG_CONFIG", "From google-services.json: $webClientId")
-        } catch (e: Exception) {
-            Log.e("DEBUG_CONFIG", "Could not read from google-services.json: ${e.message}")
-        }
-
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken("745495421824-ciq720856i7gej6rs372l2atusjlggdf.apps.googleusercontent.com")
             .requestEmail()
@@ -56,7 +39,7 @@ class AuthViewModel : ViewModel() {
                 getGoogleSignInClient(context = context).signOut().await()
                 _authState.value = AuthState.Unauthenticated
             } catch (e: Exception) {
-                _authState.value = AuthState.Error(e.message ?: "Error desconocido")
+
             }
         }
     }
@@ -73,10 +56,22 @@ class AuthViewModel : ViewModel() {
                 if (user != null) {
                     _authState.value = AuthState.Authenticated(user)
                 } else {
-                    _authState.value = AuthState.Error("User not found")
+                    _authState.value = AuthState.Error("Error en el inicio de sesión")
                 }
             } catch (e: Exception) {
                 _authState.value = AuthState.Error(e.message ?: "Error desconocido")
+            }
+        }
+
+        fun signOut(context: Context) {
+            viewModelScope.launch {
+                try {
+                    auth.signOut()
+                    getGoogleSignInClient(context = context).signOut().await()
+                    _authState.value = AuthState.Unauthenticated
+                } catch (e: Exception) {
+                    _authState.value = AuthState.Error(e.message ?: "Error al cerrar sesión")
+                }
             }
         }
     }
@@ -96,8 +91,8 @@ class AuthViewModel : ViewModel() {
 }
 
 sealed class AuthState {
-    object Loading : AuthState()
     object Unauthenticated : AuthState()
+    object Loading : AuthState()
     data class Authenticated(val user: FirebaseUser) : AuthState()
     data class Error(val message: String) : AuthState()
 }
