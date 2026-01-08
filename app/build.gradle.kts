@@ -78,6 +78,11 @@ dependencies {
     implementation("com.google.firebase:firebase-messaging")
     implementation("com.google.android.gms:play-services-auth:21.0.0")
 
+    // Also add the dependencies for the Credential Manager libraries and specify their versions
+    implementation("androidx.credentials:credentials:1.3.0")
+    implementation("androidx.credentials:credentials-play-services-auth:1.3.0")
+    implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
+
     // para google maps
     implementation("com.google.android.gms:play-services-location:21.3.0")
 
@@ -90,12 +95,12 @@ dependencies {
 
     implementation("com.squareup.retrofit2:retrofit:3.0.0")
     implementation("com.squareup.retrofit2:converter-gson:3.0.0")
-// Para el Logging (Debugging de peticiones)
+    // Para el Logging (Debugging de peticiones)
     implementation("com.squareup.okhttp3:logging-interceptor:5.3.2")
-// Conversor para manejar respuestas no-JSON (String/Scalars)
+    // Conversor para manejar respuestas no-JSON (String/Scalars)
     implementation("com.squareup.retrofit2:converter-scalars:3.0.0")
 
-// Para manejo de URIs locales y Streams
+    // Para manejo de URIs locales y Streams
     implementation("androidx.core:core-ktx:1.17.0")
 
     // Corrutinas para integración con las tareas de Firebase

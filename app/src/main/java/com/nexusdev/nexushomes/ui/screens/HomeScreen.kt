@@ -133,7 +133,7 @@ fun HomeScreen(
                     } else {
                         Toast.makeText(context, "Inicia sesión para publicar", Toast.LENGTH_SHORT)
                             .show()
-                        navController.navigate("phoneLogin")
+                        navController.navigate("login")
                     }
                 },
                 containerColor = MaterialTheme.colorScheme.primary,
