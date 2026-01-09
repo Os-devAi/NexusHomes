@@ -94,6 +94,14 @@
           }
         },
         {
+          "client_id": "745495421824-p52bqjakt6vai0l0kurrahh044jrhdp1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.nexusdev.nexushomes",
+            "certificate_hash": "580447d525df20f6d6fe4c7e7c5d98fc642f08e3"
+          }
+        },
+        {
           "client_id": "745495421824-ciq720856i7gej6rs372l2atusjlggdf.apps.googleusercontent.com",
           "client_type": 3
         }

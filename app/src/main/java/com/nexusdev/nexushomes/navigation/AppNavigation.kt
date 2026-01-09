@@ -10,6 +10,7 @@ import com.nexusdev.nexushomes.ui.screens.HomeScreen
 import com.nexusdev.nexushomes.ui.screens.HouseDetailScreen
 import com.nexusdev.nexushomes.ui.screens.LoginScreen
 import com.nexusdev.nexushomes.ui.screens.PhoneLoginScreen
+import com.nexusdev.nexushomes.ui.screens.ProfileScreen
 import com.nexusdev.nexushomes.ui.screens.PublishScreen
 import com.nexusdev.nexushomes.ui.viewmodel.HomeDataViewModel
 
@@ -19,7 +20,6 @@ fun AppNavigation(
 ) {
     val navController = rememberNavController()
     val homeViewModel: HomeDataViewModel = viewModel()
-
 
     NavHost(
         navController = navController,
@@ -37,7 +37,14 @@ fun AppNavigation(
         }
         composable("login") {
             LoginScreen(
-                viewModel = viewModel()
+                viewModel = viewModel(),
+                navController
+            )
+        }
+        composable("profile") {
+            ProfileScreen(
+                modifier,
+                navController
             )
         }
         composable("phoneLogin") {

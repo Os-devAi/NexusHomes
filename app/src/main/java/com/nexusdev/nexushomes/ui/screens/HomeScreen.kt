@@ -93,8 +93,6 @@ fun HomeScreen(
     var searchQuery by remember { mutableStateOf("") }
     var selectedFilter by remember { mutableIntStateOf(0) }
     var sortOption by remember { mutableIntStateOf(0) }
-    var showFilterMenu by remember { mutableStateOf(false) }
-    var showSortMenu by remember { mutableStateOf(false) }
 
     // 📌 Filtrado dinámico
     val filteredHouses = remember(houses, searchQuery, selectedFilter, sortOption) {
@@ -121,7 +119,6 @@ fun HomeScreen(
     // 📌 Cargar datos
     LaunchedEffect(Unit) {
         viewModel.fetchHomes()
-        Toast.makeText(context, "Usuario: ${user?.email ?: "Invitado"}", Toast.LENGTH_SHORT).show()
     }
 
     Scaffold(
@@ -129,10 +126,8 @@ fun HomeScreen(
             FloatingActionButton(
                 onClick = {
                     if (user != null) {
-                        navController.navigate("addNew")
+                        navController.navigate("profile")
                     } else {
-                        Toast.makeText(context, "Inicia sesión para publicar", Toast.LENGTH_SHORT)
-                            .show()
                         navController.navigate("login")
                     }
                 },
