@@ -15,6 +15,7 @@ import android.content.pm.PackageManager
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationTokenSource
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.nexusdev.nexushomes.model.UiState
@@ -49,8 +50,7 @@ class PublishViewModel(
     fun getCurrentLocation(context: Context) {
         // 1. Verificar Permisos
         if (ContextCompat.checkSelfPermission(
-                context,
-                Manifest.permission.ACCESS_FINE_LOCATION
+                context, Manifest.permission.ACCESS_FINE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
             // No tienes permisos.
@@ -104,7 +104,7 @@ class PublishViewModel(
     }
 
     // ----------------------------
-    // 🔵 Seleccionar imágenes
+    // seleccionar imágenes
     // ----------------------------
     fun addSelectedImageUri(uri: String) {
         val list = _uiState.value.selectedImageUris.toMutableList()
@@ -121,7 +121,7 @@ class PublishViewModel(
     }
 
     // ----------------------------
-    // 🔵 Actualizar campos del formulario
+    // actualizar campos del formulario
     // ----------------------------
     fun updateField(value: String, field: String) {
         val d = _uiState.value.propertyDetails
@@ -137,39 +137,37 @@ class PublishViewModel(
             "longitude" -> d.copy(longitude = value)
             else -> d
         }
-
         _uiState.value = _uiState.value.copy(propertyDetails = updated)
     }
 
     // ----------------------------
-    // 🔵 Subir 1 imagen comprimida
+    // subir 1 imagen comprimida
     // ----------------------------
-    private suspend fun uploadCompressedImage(uri: Uri): String? =
-        withContext(Dispatchers.IO) {
-            try {
-                val bitmap: Bitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                    val source = ImageDecoder.createSource(context.contentResolver, uri)
-                    ImageDecoder.decodeBitmap(source)
-                } else {
-                    MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
-                }
-
-                val baos = ByteArrayOutputStream()
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 70, baos)
-                val compressed = baos.toByteArray()
-
-                val filename = "houses/${UUID.randomUUID()}.jpg"
-                val ref = storage.child(filename)
-
-                ref.putBytes(compressed).await()
-
-                ref.downloadUrl.await().toString()
-
-            } catch (e: Exception) {
-                e.printStackTrace()
-                null
+    private suspend fun uploadCompressedImage(uri: Uri): String? = withContext(Dispatchers.IO) {
+        try {
+            val bitmap: Bitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                val source = ImageDecoder.createSource(context.contentResolver, uri)
+                ImageDecoder.decodeBitmap(source)
+            } else {
+                MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
             }
+
+            val baos = ByteArrayOutputStream()
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 70, baos)
+            val compressed = baos.toByteArray()
+
+            val filename = "houses/${UUID.randomUUID()}.jpg"
+            val ref = storage.child(filename)
+
+            ref.putBytes(compressed).await()
+
+            ref.downloadUrl.await().toString()
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
         }
+    }
 
     // ----------------------------
     // 🔵 Subir varias imágenes
@@ -192,7 +190,7 @@ class PublishViewModel(
             try {
                 _uiState.value = _uiState.value.copy(isLoading = true)
 
-                // 1️⃣ Subir imágenes
+                // 1 subir imagenes
                 val uploadedUrls = uploadAllImages()
 
                 if (uploadedUrls.isEmpty()) {
@@ -201,12 +199,14 @@ class PublishViewModel(
                     return@launch
                 }
 
-                // 2️⃣ Crear modelo final
+                // 2 crear modelo final
                 val finalHouse = _uiState.value.propertyDetails.copy(
-                    image = ArrayList(uploadedUrls)
+                    image = ArrayList(uploadedUrls),
+                    status = "Activo",
+                    userId = FirebaseAuth.getInstance().currentUser?.uid
                 )
 
-                // 3️⃣ Guardar en Firestore
+                // 3 guardar en Firestore
                 homesCollection.add(finalHouse).await()
 
                 _uiState.value =
@@ -216,8 +216,7 @@ class PublishViewModel(
                 _uiState.value = UiState()
 
             } catch (e: Exception) {
-                _uiState.value =
-                    _uiState.value.copy(userMessage = "❌ Error: ${e.localizedMessage}")
+                _uiState.value = _uiState.value.copy(userMessage = "❌ Error: ${e.localizedMessage}")
             } finally {
                 _uiState.value = _uiState.value.copy(isLoading = false)
             }

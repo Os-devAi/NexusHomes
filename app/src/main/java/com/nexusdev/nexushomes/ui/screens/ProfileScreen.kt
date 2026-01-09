@@ -130,7 +130,7 @@ fun ProfileScreen(
             Button(
                 onClick = {
                     // navegar al formulario de nueva publicacion
-
+                    naviController.navigate("updates")
                 },
                 modifier = Modifier
                     .fillMaxWidth()

@@ -230,23 +230,23 @@ fun HomeScreen(
                             }
 
                             // Botón de configuración
-                            IconButton(
-                                onClick = {
-                                    Toast.makeText(context, "Configuración", Toast.LENGTH_SHORT)
-                                        .show()
-                                },
-                                modifier = Modifier
-                                    .size(48.dp)
-                                    .clip(CircleShape)
-                                    .background(MaterialTheme.colorScheme.surface)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Filled.Settings,
-                                    contentDescription = "Configuración",
-                                    tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(22.dp)
-                                )
-                            }
+//                            IconButton(
+//                                onClick = {
+//                                    Toast.makeText(context, "Configuración", Toast.LENGTH_SHORT)
+//                                        .show()
+//                                },
+//                                modifier = Modifier
+//                                    .size(48.dp)
+//                                    .clip(CircleShape)
+//                                    .background(MaterialTheme.colorScheme.surface)
+//                            ) {
+//                                Icon(
+//                                    imageVector = Icons.Filled.Settings,
+//                                    contentDescription = "Configuración",
+//                                    tint = MaterialTheme.colorScheme.primary,
+//                                    modifier = Modifier.size(22.dp)
+//                                )
+//                            }
                         }
 
                         Spacer(modifier = Modifier.height(16.dp))

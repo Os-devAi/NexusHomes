@@ -9,6 +9,7 @@ import androidx.navigation.compose.rememberNavController
 import com.nexusdev.nexushomes.ui.screens.HomeScreen
 import com.nexusdev.nexushomes.ui.screens.HouseDetailScreen
 import com.nexusdev.nexushomes.ui.screens.LoginScreen
+import com.nexusdev.nexushomes.ui.screens.MuUpdates
 import com.nexusdev.nexushomes.ui.screens.PhoneLoginScreen
 import com.nexusdev.nexushomes.ui.screens.ProfileScreen
 import com.nexusdev.nexushomes.ui.screens.PublishScreen
@@ -49,6 +50,12 @@ fun AppNavigation(
         }
         composable("phoneLogin") {
             PhoneLoginScreen()
+        }
+        composable("updates") {
+            MuUpdates(
+                modifier,
+                navController
+            )
         }
     }
 }

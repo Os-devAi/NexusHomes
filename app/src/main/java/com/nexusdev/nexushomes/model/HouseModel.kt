@@ -11,7 +11,9 @@ data class HouseModel(
     val location: String? = null,
     val latitude: String? = null,
     val longitude: String? = null,
-    val image: ArrayList<String>? = null
+    val image: ArrayList<String>? = null,
+    val status: String? = null,
+    val userId: String? = null
 )
 
 data class UiState(
