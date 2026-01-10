@@ -105,13 +105,12 @@ fun HomeScreen(
         // Aplicar filtro por tipo
         filtered = when (selectedFilter) {
             1 -> filtered.filter { it.type?.lowercase()?.contains("casa") == true }
-            2 -> filtered.filter { it.type?.lowercase()?.contains("apartamento") == true }
-            3 -> filtered.filter { it.type?.lowercase()?.contains("terreno") == true }
+            2 -> filtered.filter { it.type?.lowercase()?.contains("habitación") == true }
+            3 -> filtered.filter { it.type?.lowercase()?.contains("apartamento") == true }
+            4 -> filtered.filter { it.type?.lowercase()?.contains("terreno") == true }
+            5 -> filtered.filter { it.type?.lowercase()?.contains("local") == true }
             else -> filtered
         }
-
-        // Aplicar ordenamiento
-
 
         filtered
     }
@@ -198,11 +197,14 @@ fun HomeScreen(
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Icon(
-                                        imageVector = Icons.Filled.LocationOn,
+                                    Image(
+                                        painter = painterResource(R.drawable.play_store_),
                                         contentDescription = "Logo",
-                                        tint = MaterialTheme.colorScheme.primary,
-                                        modifier = Modifier.size(28.dp)
+                                        modifier = Modifier
+                                            .size(28.dp)
+                                            .clip(
+                                                shape = CircleShape
+                                            )
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Text(
@@ -347,7 +349,7 @@ fun HomeScreen(
                                 },
                                 modifier = Modifier
                                     .weight(1f)
-                                    .height(48.dp),
+                                    .height(50.dp),
                                 shape = RoundedCornerShape(12.dp),
                                 maxLines = 1,
                                 singleLine = true
@@ -546,6 +548,7 @@ fun HomeScreen(
                             val filterTypes = listOf(
                                 "Todas" to Icons.Default.LocationOn,
                                 "Casas" to Icons.Default.LocationOn,
+                                "Cuartos" to Icons.Default.LocationOn,
                                 "Apartamentos" to Icons.Default.LocationOn
                             )
 

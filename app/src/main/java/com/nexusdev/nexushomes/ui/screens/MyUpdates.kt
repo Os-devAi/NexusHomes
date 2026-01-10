@@ -20,6 +20,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
 import com.nexusdev.nexushomes.ui.components.HouseCard
+import com.nexusdev.nexushomes.ui.components.UpdatesCard
 import com.nexusdev.nexushomes.ui.viewmodel.HomeDataViewModel
 
 @Composable
@@ -73,12 +74,10 @@ fun MuUpdates(
                     Text("No hay publicaciones")
                 } else {
                     houses.forEach { house ->
-                        HouseCard(house = house, {})
+                        UpdatesCard(house)
                     }
                 }
             }
         }
     }
 }
-
-// crear card para mis updates con botones para marcar como no disponible y borrar (editar luego en la siguiente version)
