@@ -68,18 +68,20 @@ fun UpdatesCard(
             Text("Estado: " + house.status.toString())
             Text("Precio/Renta: " + house.price.toString())
             Spacer(modifier = Modifier.height(16.dp))
+            Button(
+                onClick = {},
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Done,
+                    contentDescription = "Done"
+                )
+            }
+            Spacer(modifier = Modifier.height(16.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceAround
             ) {
-                Button(
-                    onClick = {}
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Done,
-                        contentDescription = "Done"
-                    )
-                }
                 Button(
                     onClick = {}
                 ) {
