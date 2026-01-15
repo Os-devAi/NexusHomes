@@ -8,16 +8,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -28,28 +19,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -71,45 +42,27 @@ fun PublishScreen(
     modifier: Modifier
 ) {
     val context = LocalContext.current
-
-    val viewModel: PublishViewModel = viewModel(
-        factory = PublishViewModelFactory(context)
-    )
-
-    // Observar el estado del ViewModel
+    val viewModel: PublishViewModel = viewModel(factory = PublishViewModelFactory(context))
     val uiState by viewModel.uiState.collectAsState()
-    val details = uiState.propertyDetails // HouseModel
+    val details = uiState.propertyDetails
     val selectedImageUris = uiState.selectedImageUris
 
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        uri?.let {
-            viewModel.addSelectedImageUri(it.toString())
-        }
-    }
+    ) { uri: Uri? -> uri?.let { viewModel.addSelectedImageUri(it.toString()) } }
 
-    // para location
-    // 1. Define el Launcher para la solicitud de permisos
     val locationPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
-    ) { isGranted: Boolean ->
-        if (isGranted) {
-            // Permiso concedido: llama inmediatamente a la función de obtención de ubicación
-            viewModel.getCurrentLocation(context)
-        } else {
-            // Permiso denegado: informa al usuario
-            viewModel.showSnackbar("Permiso de ubicación denegado. No se puede obtener la posición actual.")
-        }
+    ) { isGranted ->
+        if (isGranted) viewModel.getCurrentLocation(context)
+        else viewModel.showSnackbar("Permiso de ubicación denegado.")
     }
 
-    // Mostrar Snackbar para mensajes de usuario (errores/éxito)
     val snackbarHostState = remember { SnackbarHostState() }
     val userMessage = uiState.userMessage
 
     LaunchedEffect(userMessage) {
         if (userMessage != null) {
-            // Se usa showSnackbar
             snackbarHostState.showSnackbar(userMessage)
             viewModel.dismissMessage()
         }
@@ -125,20 +78,18 @@ fun PublishScreen(
                 .padding(paddingValues)
                 .padding(horizontal = 16.dp)
         ) {
-            // Header
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    // ⚠️ Corrección: Añadimos un padding top si el Scaffold no lo maneja
                     .padding(top = 16.dp)
                     .height(75.dp),
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Column(
+                Box(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(horizontal = 16.dp),
-                    verticalArrangement = Arrangement.Center
+                    contentAlignment = Alignment.CenterStart
                 ) {
                     Text(
                         text = "Publicar una nueva propiedad",
@@ -149,43 +100,39 @@ fun PublishScreen(
 
             Spacer(modifier = Modifier.height(25.dp))
 
-            // Formulario
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp)
-            ) {
+            Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp)) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp)
                 ) {
-                    // --- Sección de Subida de Imágenes ---
+
                     Text(
-                        text = "Imágenes (Máx. 3)",
+                        text = "Imágenes (Mín. 1 - Máx. 3)",
                         style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.padding(bottom = 8.dp)
+                        color = if (selectedImageUris.isEmpty()) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
                     )
+
+                    Spacer(modifier = Modifier.height(8.dp))
 
                     ImageUploadSection(
                         selectedImageUris = selectedImageUris,
                         onAddImageClicked = {
-                            if (selectedImageUris.size < 3) {
-                                imagePickerLauncher.launch("image/*") // Abrir selector de imágenes
-                            }
+                            if (selectedImageUris.size < 3) imagePickerLauncher.launch(
+                                "image/*"
+                            )
                         },
                         onRemoveImageClicked = viewModel::removeSelectedImageUri
                     )
 
                     Spacer(modifier = Modifier.height(20.dp))
-                    // --- Fin Sección de Subida de Imágenes ---
 
-
-                    // Título (Usamos ?.not() de Kotlin para hacer la validación concisa)
                     OutlinedTextField(
                         value = details.title ?: "",
                         onValueChange = { viewModel.updateField(it, "title") },
                         label = { Text("Título de la publicación") },
                         placeholder = { Text("Ej: Hermosa casa de 3 habitaciones...") },
+                        isError = details.title.isNullOrBlank(),
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
                         singleLine = true
@@ -193,73 +140,68 @@ fun PublishScreen(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    // Descripción
                     OutlinedTextField(
                         value = details.description ?: "",
                         onValueChange = { viewModel.updateField(it, "description") },
                         label = { Text("Descripción") },
                         placeholder = { Text("Describe la propiedad en detalle...") },
+                        isError = details.description.isNullOrBlank(),
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(120.dp),
-                        shape = RoundedCornerShape(12.dp),
-                        maxLines = 5
+                        shape = RoundedCornerShape(12.dp)
                     )
 
                     Spacer(modifier = Modifier.height(12.dp))
-
-                    // Tipo de propiedad
-//                    OutlinedTextField(
-//                        value = details.type ?: "",
-//                        onValueChange = { viewModel.updateField(it, "type") },
-//                        label = { Text("Tipo de propiedad") },
-//                        placeholder = { Text("Ej: Casa, Apartamento, Villa, etc.") },
-//                        modifier = Modifier.fillMaxWidth(),
-//                        shape = RoundedCornerShape(12.dp),
-//                        singleLine = true
-//                    )
 
                     TipoPropiedadSelector(
                         currentType = details.type,
                         onTypeSelected = { viewModel.updateField(it, "type") }
                     )
+                    if (details.type.isNullOrBlank()) {
+                        Text(
+                            "Seleccione un tipo",
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    // Precio
                     OutlinedTextField(
                         value = details.price ?: "",
                         onValueChange = { viewModel.updateField(it, "price") },
                         label = { Text("Precio mensual") },
                         placeholder = { Text("Ej: 1500") },
+                        isError = details.price.isNullOrBlank(),
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
-                        singleLine = true,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        singleLine = true
                     )
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    // Contacto
                     OutlinedTextField(
                         value = details.contact ?: "",
                         onValueChange = { viewModel.updateField(it, "contact") },
                         label = { Text("Información de contacto") },
                         placeholder = { Text("Teléfono o email") },
+                        isError = details.contact.isNullOrBlank(),
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
-                        singleLine = true,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                        singleLine = true
                     )
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    // Dirección
                     OutlinedTextField(
                         value = details.address ?: "",
                         onValueChange = { viewModel.updateField(it, "address") },
                         label = { Text("Dirección completa") },
                         placeholder = { Text("Calle, número, sector...") },
+                        isError = details.address.isNullOrBlank(),
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
                         singleLine = true
@@ -267,12 +209,12 @@ fun PublishScreen(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    // Ubicación (nombre del lugar)
                     OutlinedTextField(
                         value = details.location ?: "",
                         onValueChange = { viewModel.updateField(it, "location") },
-                        label = { Text("Nombre de la ubicación") },
+                        label = { Text("Nombre de la ubicación (Sector)") },
                         placeholder = { Text("Ej: Zona Colonial, Piantini, etc.") },
+                        isError = details.location.isNullOrBlank(),
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
                         singleLine = true
@@ -280,7 +222,6 @@ fun PublishScreen(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    // Coordenadas
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -290,89 +231,71 @@ fun PublishScreen(
                             onValueChange = { viewModel.updateField(it, "latitude") },
                             label = { Text("Latitud") },
                             placeholder = { Text("18.4861") },
+                            isError = details.latitude.isNullOrBlank(),
                             modifier = Modifier.weight(1f),
                             shape = RoundedCornerShape(12.dp),
-                            singleLine = true,
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                         )
-
                         OutlinedTextField(
                             value = details.longitude ?: "",
                             onValueChange = { viewModel.updateField(it, "longitude") },
                             label = { Text("Longitud") },
                             placeholder = { Text("-69.9312") },
+                            isError = details.longitude.isNullOrBlank(),
                             modifier = Modifier.weight(1f),
                             shape = RoundedCornerShape(12.dp),
-                            singleLine = true,
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
 
-// --- NUEVA SECCIÓN: Selección de Coordenadas ---
                     Text(
                         text = "Coordenadas GPS",
                         style = MaterialTheme.typography.titleMedium,
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
 
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Button(
-                            onClick = {
-                                // Lógica: 1. Verifica si el permiso existe
-                                if (ContextCompat.checkSelfPermission(
-                                        context,
-                                        Manifest.permission.ACCESS_FINE_LOCATION
-                                    ) == PackageManager.PERMISSION_GRANTED
-                                ) {
-                                    // Permiso ya concedido: Ejecuta la lógica directamente
-                                    viewModel.getCurrentLocation(context)
-                                } else {
-                                    // Permiso no concedido: Solicita el permiso
-                                    locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-                                }
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(
+                        text = "Ingresa las coordenadas exactas de la propiedad de forma manual o usa la ubicación actual",
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+
+                    Button(
+                        onClick = {
+                            if (ContextCompat.checkSelfPermission(
+                                    context,
+                                    Manifest.permission.ACCESS_FINE_LOCATION
+                                ) == PackageManager.PERMISSION_GRANTED
+                            ) {
                                 viewModel.getCurrentLocation(context)
-                            },
-                            // Deshabilita si está cargando o si la ubicación ya fue obtenida/seleccionada
-                            enabled = !uiState.isLoading,
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            Text("Ubicación Actual")
-                        }
-
-                        /*Button(
-                            onClick = {
-                                // Navegación a la pantalla del mapa
-                                // Debes definir la ruta para la pantalla de selección de mapa (ej: "select_map")
-                                // navController.navigate("select_map")
-                                viewModel.showSnackbar("Función Seleccionar en Mapa (requiere integración con Google Maps o similar)")
-                            },
-                            enabled = !uiState.isLoading,
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            Text("Seleccionar en Mapa")
-                        }*/
+                            } else {
+                                locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = !uiState.isLoading
+                    ) {
+                        Text("Obtener Ubicación Actual")
                     }
-                    Spacer(modifier = Modifier.height(12.dp))
 
-                    Spacer(modifier = Modifier.height(20.dp))
+                    Spacer(modifier = Modifier.height(24.dp))
 
-                    // Botón de publicación
                     Button(
                         onClick = { viewModel.publishProperty() },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(55.dp)
+                            .height(55.dp),
+                        enabled = !uiState.isLoading
                     ) {
                         if (uiState.isLoading) {
                             CircularProgressIndicator(
+                                modifier = Modifier.size(24.dp),
                                 color = Color.White,
-                                strokeWidth = 2.dp,
-                                modifier = Modifier.size(24.dp)
+                                strokeWidth = 2.dp
                             )
                         } else {
                             Text("Publicar propiedad")
@@ -385,166 +308,94 @@ fun PublishScreen(
     }
 }
 
-// Composable para la selección y visualización de imágenes (Sin cambios)
 @Composable
 fun ImageUploadSection(
     selectedImageUris: List<String>,
     onAddImageClicked: () -> Unit,
     onRemoveImageClicked: (String) -> Unit
 ) {
-    LazyRow(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(10.dp)
-    ) {
-        // Ítem para el botón de añadir imagen
-        item {
-            AddImageButton(
-                onClick = onAddImageClicked,
-                isEnabled = selectedImageUris.size < 3
-            )
-        }
-
-        // Ítems para las imágenes seleccionadas
-        items(selectedImageUris) { uriString ->
-            SelectedImagePreview(
-                uriString = uriString,
-                onRemoveClicked = { onRemoveImageClicked(uriString) }
-            )
+    LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+        item { AddImageButton(onClick = onAddImageClicked, isEnabled = selectedImageUris.size < 3) }
+        items(selectedImageUris) { uri ->
+            SelectedImagePreview(uriString = uri, onRemoveClicked = { onRemoveImageClicked(uri) })
         }
     }
 }
 
-// Botón para añadir una nueva imagen (Sin cambios)
 @Composable
-fun AddImageButton(
-    onClick: () -> Unit,
-    isEnabled: Boolean
-) {
+fun AddImageButton(onClick: () -> Unit, isEnabled: Boolean) {
     Card(
         modifier = Modifier
             .size(100.dp)
             .clip(RoundedCornerShape(8.dp))
-            .clickable(onClick = onClick, enabled = isEnabled)
+            .clickable(enabled = isEnabled, onClick = onClick)
             .border(
-                width = 2.dp,
-                color = if (isEnabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
-                shape = RoundedCornerShape(8.dp)
-            ),
-        shape = RoundedCornerShape(8.dp)
+                2.dp,
+                if (isEnabled) MaterialTheme.colorScheme.primary else Color.LightGray,
+                RoundedCornerShape(8.dp)
+            )
     ) {
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier.fillMaxSize()
-        ) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Icon(
-                imageVector = Icons.Default.AddCircle,
-                contentDescription = "Añadir imagen",
-                tint = if (isEnabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
-                modifier = Modifier.size(40.dp)
+                Icons.Default.AddCircle,
+                null,
+                modifier = Modifier.size(40.dp),
+                tint = if (isEnabled) MaterialTheme.colorScheme.primary else Color.LightGray
             )
         }
     }
 }
 
-// Previsualización de la imagen seleccionada (Sin cambios)
 @Composable
-fun SelectedImagePreview(
-    uriString: String,
-    onRemoveClicked: () -> Unit
-) {
-    Box(
-        modifier = Modifier.size(100.dp)
-    ) {
-        // Usar Coil para cargar la imagen localmente desde la URI
-        val painter = rememberAsyncImagePainter(Uri.parse(uriString))
+fun SelectedImagePreview(uriString: String, onRemoveClicked: () -> Unit) {
+    Box(modifier = Modifier.size(100.dp)) {
         Image(
-            painter = painter,
+            painter = rememberAsyncImagePainter(Uri.parse(uriString)),
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .fillMaxSize()
                 .clip(RoundedCornerShape(8.dp))
         )
-
-        // Botón de eliminar (X)
         Surface(
-            color = Color.Black.copy(alpha = 0.6f),
-            shape = CircleShape,
+            color = Color.Black.copy(0.6f), shape = CircleShape,
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 .padding(4.dp)
-                .size(20.dp)
-                .clickable(onClick = onRemoveClicked)
+                .size(24.dp)
+                .clickable { onRemoveClicked() }
         ) {
-            Icon(
-                imageVector = Icons.Default.Close,
-                contentDescription = "Eliminar imagen",
-                tint = Color.White,
-                modifier = Modifier.size(12.dp)
-            )
+            Icon(Icons.Default.Close, null, tint = Color.White, modifier = Modifier.padding(4.dp))
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TipoPropiedadSelector(
-    currentType: String?,
-    onTypeSelected: (String) -> Unit
-) {
-    // 1. Lista de opciones disponibles
+fun TipoPropiedadSelector(currentType: String?, onTypeSelected: (String) -> Unit) {
     val propertyTypes =
         listOf("Casa", "Apartamento", "Habitación", "Lote", "Local Comercial", "Oficina")
-
-    // 2. Estado para controlar si el menú desplegable está expandido
     var expanded by remember { mutableStateOf(false) }
 
-    // 3. Texto visible: usa el valor seleccionado o un texto predeterminado
-    val selectedText = currentType ?: ""
-
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = {
-            expanded = !expanded
-        },
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        // El OutlinedTextField sirve como el contenedor visible
+    ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }) {
         OutlinedTextField(
-            // El modificador 'menuAnchor' es necesario para Compose 1.5+
+            value = currentType ?: "",
+            onValueChange = {},
+            readOnly = true,
+            label = { Text("Tipo de propiedad") },
+            placeholder = { Text("Selecciona el tipo...") },
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             modifier = Modifier
                 .fillMaxWidth()
                 .menuAnchor(),
-            readOnly = true, // No permite escribir, solo seleccionar
-            value = selectedText,
-            onValueChange = {}, // No se usa ya que es de solo lectura
-            label = { Text("Tipo de propiedad") },
-            trailingIcon = {
-                ExposedDropdownMenuDefaults.TrailingIcon(
-                    expanded = expanded
-                )
-            },
-            placeholder = { Text("Selecciona el tipo...") },
             shape = RoundedCornerShape(12.dp),
-            colors = ExposedDropdownMenuDefaults.textFieldColors(),
+            isError = currentType.isNullOrBlank()
         )
-
-        // El menú desplegable que aparece al hacer clic
-        ExposedDropdownMenu(
-            expanded = expanded,
-            onDismissRequest = {
-                expanded = false
-            }
-        ) {
-            propertyTypes.forEach { selectionOption ->
+        ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+            propertyTypes.forEach { type ->
                 DropdownMenuItem(
-                    text = { Text(selectionOption) },
-                    onClick = {
-                        onTypeSelected(selectionOption) // Notifica al ViewModel la selección
-                        expanded = false // Cierra el menú después de seleccionar
-                    },
-                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
-                )
+                    text = { Text(type) },
+                    onClick = { onTypeSelected(type); expanded = false })
             }
         }
     }

@@ -182,41 +182,67 @@ class PublishViewModel(
         return urls
     }
 
-    // ----------------------------
-    // 🔵 PUBLICAR PROPIEDAD
-    // ----------------------------
+
+    // validar campos no vacios
+    private fun validateFields(): String? {
+        val d = _uiState.value.propertyDetails
+        val uris = _uiState.value.selectedImageUris
+
+        return when {
+            uris.isEmpty() -> "Selecciona al menos una imagen para tu propiedad."
+            d.title.isNullOrBlank() -> "El título de la publicación es obligatorio."
+            d.description.isNullOrBlank() -> "Por favor, añade una descripción detallada."
+            d.type.isNullOrBlank() -> "Debes seleccionar un tipo de propiedad."
+            d.price.isNullOrBlank() -> "El precio es obligatorio."
+            d.contact.isNullOrBlank() -> "Añade un número o email de contacto."
+            d.address.isNullOrBlank() -> "La dirección física es necesaria."
+            d.location.isNullOrBlank() -> "Indica el nombre del sector o zona."
+            d.latitude.isNullOrBlank() || d.longitude.isNullOrBlank() -> "Las coordenadas GPS son obligatorias."
+            else -> null
+        }
+    }
+
+
+    // funcion para publicar la pantalla
     fun publishProperty() {
         viewModelScope.launch {
+            // 1. Ejecutar validación antes de empezar cualquier proceso
+            val validationError = validateFields()
+            if (validationError != null) {
+                showSnackbar("⚠️ $validationError")
+                return@launch
+            }
+
             try {
                 _uiState.value = _uiState.value.copy(isLoading = true)
 
-                // 1 subir imagenes
+                // 2. Subir imágenes (ahora solo ocurre si los campos están llenos)
                 val uploadedUrls = uploadAllImages()
 
                 if (uploadedUrls.isEmpty()) {
-                    _uiState.value =
-                        _uiState.value.copy(userMessage = "❌ No se pudieron subir las imágenes.")
+                    showSnackbar("❌ No se pudieron subir las imágenes.")
                     return@launch
                 }
 
-                // 2 crear modelo final
+                // 3. Crear modelo final
                 val finalHouse = _uiState.value.propertyDetails.copy(
                     image = ArrayList(uploadedUrls),
                     status = "Activo",
                     userId = FirebaseAuth.getInstance().currentUser?.uid
                 )
 
-                // 3 guardar en Firestore
+                // 4. Guardar en Firestore
                 homesCollection.add(finalHouse).await()
 
-                _uiState.value =
-                    _uiState.value.copy(userMessage = "✅ Publicación creada con éxito!")
-
-                // Limpiar formulario
-                _uiState.value = UiState()
+                _uiState.value = _uiState.value.copy(
+                    userMessage = "✅ Publicación creada con éxito!",
+                    // Reiniciamos todo el estado para limpiar el formulario
+                    propertyDetails = com.nexusdev.nexushomes.model.HouseModel(),
+                    selectedImageUris = emptyList()
+                )
 
             } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(userMessage = "❌ Error: ${e.localizedMessage}")
+                showSnackbar("❌ Error: ${e.localizedMessage}")
             } finally {
                 _uiState.value = _uiState.value.copy(isLoading = false)
             }

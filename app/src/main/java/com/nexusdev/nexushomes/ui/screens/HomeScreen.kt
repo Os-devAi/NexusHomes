@@ -1,10 +1,10 @@
 package com.nexusdev.nexushomes.ui.screens
 
-import android.widget.Toast
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,23 +23,18 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Sort
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -57,24 +52,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import coil.compose.rememberAsyncImagePainter
 import com.google.firebase.auth.FirebaseAuth
 import com.nexusdev.nexushomes.R
+import com.nexusdev.nexushomes.ui.components.ModernHouseCard
 import com.nexusdev.nexushomes.ui.viewmodel.HomeDataViewModel
 
 @Composable
@@ -87,14 +78,14 @@ fun HomeScreen(
     val firebaseAuth = FirebaseAuth.getInstance()
     val user = firebaseAuth.currentUser
 
-    // 📌 Estados
+    // Estados
     val houses by viewModel.houses.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     var searchQuery by remember { mutableStateOf("") }
     var selectedFilter by remember { mutableIntStateOf(0) }
     var sortOption by remember { mutableIntStateOf(0) }
 
-    // 📌 Filtrado dinámico
+    // Filtrado dinámico
     val filteredHouses = remember(houses, searchQuery, selectedFilter, sortOption) {
         var filtered = houses.filter { house ->
             val query = searchQuery.lowercase()
@@ -115,7 +106,7 @@ fun HomeScreen(
         filtered
     }
 
-    // 📌 Cargar datos
+    // Cargar datos
     LaunchedEffect(Unit) {
         viewModel.fetchHomes()
     }
@@ -179,7 +170,7 @@ fun HomeScreen(
                         .background(MaterialTheme.colorScheme.background)
                 ) {
 
-                    // 🎯 Encabezado moderno
+                    // Encabezado moderno
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -230,25 +221,6 @@ fun HomeScreen(
                                     color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
                                 )
                             }
-
-                            // Botón de configuración
-//                            IconButton(
-//                                onClick = {
-//                                    Toast.makeText(context, "Configuración", Toast.LENGTH_SHORT)
-//                                        .show()
-//                                },
-//                                modifier = Modifier
-//                                    .size(48.dp)
-//                                    .clip(CircleShape)
-//                                    .background(MaterialTheme.colorScheme.surface)
-//                            ) {
-//                                Icon(
-//                                    imageVector = Icons.Filled.Settings,
-//                                    contentDescription = "Configuración",
-//                                    tint = MaterialTheme.colorScheme.primary,
-//                                    modifier = Modifier.size(22.dp)
-//                                )
-//                            }
                         }
 
                         Spacer(modifier = Modifier.height(16.dp))
@@ -310,7 +282,7 @@ fun HomeScreen(
                         }
                     }
 
-                    // 🔍 Barra de búsqueda mejorada
+                    // Barra de búsqueda mejorada
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -354,90 +326,10 @@ fun HomeScreen(
                                 maxLines = 1,
                                 singleLine = true
                             )
-
-                            // Botón de filtros
-                            /*Box {
-                                IconButton(
-                                    onClick = { showFilterMenu = true },
-                                    modifier = Modifier
-                                        .size(40.dp)
-                                        .clip(CircleShape)
-                                        .background(
-                                            if (selectedFilter > 0) MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
-                                            else MaterialTheme.colorScheme.surfaceVariant
-                                        )
-                                ) {
-                                    BadgedBox(
-                                        badge = {
-                                            if (selectedFilter > 0) {
-                                                Badge(
-                                                    containerColor = MaterialTheme.colorScheme.secondary,
-                                                    contentColor = MaterialTheme.colorScheme.onSecondary,
-                                                    modifier = Modifier.size(8.dp)
-                                                )
-                                            }
-                                        }
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Filled.FilterList,
-                                            contentDescription = "Filtrar",
-                                            tint = if (selectedFilter > 0) MaterialTheme.colorScheme.primary
-                                            else MaterialTheme.colorScheme.onSurfaceVariant,
-                                            modifier = Modifier.size(20.dp)
-                                        )
-                                    }
-                                }
-
-                                DropdownMenu(
-                                    expanded = showFilterMenu,
-                                    onDismissRequest = { showFilterMenu = false },
-                                    modifier = Modifier
-                                        .width(200.dp)
-                                        .background(MaterialTheme.colorScheme.surface)
-                                ) {
-                                    listOf(
-                                        "Todas las propiedades" to Icons.Default.FilterList,
-                                        "Solo casas" to Icons.Default.LocationOn,
-                                        "Solo apartamentos" to Icons.Default.LocationOn,
-                                        "Solo terrenos" to Icons.Default.LocationOn
-                                    ).forEachIndexed { index, (text, icon) ->
-                                        DropdownMenuItem(
-                                            text = {
-                                                Row(
-                                                    verticalAlignment = Alignment.CenterVertically
-                                                ) {
-                                                    Icon(
-                                                        imageVector = icon,
-                                                        contentDescription = null,
-                                                        tint = MaterialTheme.colorScheme.primary,
-                                                        modifier = Modifier.size(18.dp)
-                                                    )
-                                                    Spacer(modifier = Modifier.width(12.dp))
-                                                    Text(text)
-                                                }
-                                            },
-                                            onClick = {
-                                                selectedFilter = index
-                                                showFilterMenu = false
-                                            },
-                                            trailingIcon = {
-                                                if (selectedFilter == index) {
-                                                    Icon(
-                                                        painter = painterResource(id = R.drawable.ic_launcher_foreground),
-                                                        contentDescription = "Seleccionado",
-                                                        tint = MaterialTheme.colorScheme.primary,
-                                                        modifier = Modifier.size(16.dp)
-                                                    )
-                                                }
-                                            }
-                                        )
-                                    }
-                                }
-                            }*/
                         }
                     }
 
-                    // 📊 Filtros rápidos
+                    // Filtros rápidos
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -455,85 +347,6 @@ fun HomeScreen(
                                 ),
                                 color = MaterialTheme.colorScheme.onBackground
                             )
-
-                            // Botón de ordenamiento
-                            /*Box {
-                                Surface(
-                                    modifier = Modifier
-                                        .clip(RoundedCornerShape(12.dp))
-                                        .clickable { showSortMenu = true },
-                                    color = MaterialTheme.colorScheme.surfaceVariant
-                                ) {
-                                    Row(
-                                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Filled.Sort,
-                                            contentDescription = "Ordenar",
-                                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                            modifier = Modifier.size(16.dp)
-                                        )
-                                        Spacer(modifier = Modifier.width(6.dp))
-                                        Text(
-                                            text = when (sortOption) {
-                                                1 -> "Precio: menor"
-                                                2 -> "Precio: mayor"
-                                                else -> "Más recientes"
-                                            },
-                                            style = MaterialTheme.typography.labelSmall.copy(
-                                                fontWeight = FontWeight.Medium
-                                            ),
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                                        )
-                                    }
-                                }
-
-                                DropdownMenu(
-                                    expanded = showSortMenu,
-                                    onDismissRequest = { showSortMenu = false },
-                                    modifier = Modifier
-                                        .width(200.dp)
-                                        .background(MaterialTheme.colorScheme.surface)
-                                ) {
-                                    listOf(
-                                        "Más recientes" to Icons.Default.Sort,
-                                        "Precio: menor a mayor" to Icons.Default.Sort,
-                                        "Precio: mayor a menor" to Icons.Default.Sort
-                                    ).forEachIndexed { index, (text, icon) ->
-                                        DropdownMenuItem(
-                                            text = {
-                                                Row(
-                                                    verticalAlignment = Alignment.CenterVertically
-                                                ) {
-                                                    Icon(
-                                                        imageVector = icon,
-                                                        contentDescription = null,
-                                                        tint = MaterialTheme.colorScheme.primary,
-                                                        modifier = Modifier.size(18.dp)
-                                                    )
-                                                    Spacer(modifier = Modifier.width(12.dp))
-                                                    Text(text)
-                                                }
-                                            },
-                                            onClick = {
-                                                sortOption = index
-                                                showSortMenu = false
-                                            },
-                                            trailingIcon = {
-                                                if (sortOption == index) {
-                                                    Icon(
-                                                        painter = painterResource(id = R.drawable.ic_launcher_foreground),
-                                                        contentDescription = "Seleccionado",
-                                                        tint = MaterialTheme.colorScheme.primary,
-                                                        modifier = Modifier.size(16.dp)
-                                                    )
-                                                }
-                                            }
-                                        )
-                                    }
-                                }
-                            }*/
                         }
 
                         Spacer(modifier = Modifier.height(12.dp))
@@ -586,7 +399,7 @@ fun HomeScreen(
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    // 📱 CONTENIDO PRINCIPAL
+                    // CONTENIDO PRINCIPAL
                     if (filteredHouses.isEmpty()) {
                         // Estado vacío
                         Column(
@@ -628,7 +441,7 @@ fun HomeScreen(
                             )
                         }
                     } else {
-                        // 🏡 Grid de propiedades modernizado
+                        // Grid de propiedades modernizado
                         LazyVerticalGrid(
                             columns = GridCells.Fixed(2),
                             verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -646,162 +459,6 @@ fun HomeScreen(
                             })
                     }
                 }
-            }
-        }
-    }
-}
-
-@Composable
-fun ModernHouseCard(
-    house: com.nexusdev.nexushomes.model.HouseModel, onClick: () -> Unit
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(280.dp)
-            .clickable(onClick = onClick)
-            .shadow(
-                elevation = 4.dp, shape = RoundedCornerShape(20.dp), clip = true
-            ),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
-        shape = RoundedCornerShape(20.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
-    ) {
-        Column(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            // Imagen con overlay de precio
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(0.6f)
-            ) {
-                // Imagen de la propiedad
-                Image(
-                    painter = rememberAsyncImagePainter(
-                        model = house.image?.firstOrNull(),
-                        error = painterResource(id = R.drawable.ic_launcher_foreground)
-                    ),
-                    contentDescription = house.title ?: "Propiedad",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize()
-                )
-
-                // Overlay de gradiente superior
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(40.dp)
-                        .background(
-                            brush = Brush.verticalGradient(
-                                colors = listOf(
-                                    Color.Black.copy(alpha = 0.4f), Color.Transparent
-                                )
-                            )
-                        )
-                        .align(Alignment.TopStart)
-                )
-
-                // Badge de tipo
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.TopStart)
-                        .padding(12.dp)
-                ) {
-                    Surface(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(10.dp))
-                            .shadow(2.dp),
-                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.95f)
-                    ) {
-                        Text(
-                            text = house.type?.take(4) ?: "PROP",
-                            style = MaterialTheme.typography.labelSmall.copy(
-                                fontWeight = FontWeight.Bold, fontSize = 10.sp
-                            ),
-                            color = MaterialTheme.colorScheme.onPrimary,
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                        )
-                    }
-                }
-
-                // Precio en la esquina inferior derecha
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .padding(12.dp)
-                ) {
-                    Surface(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(10.dp))
-                            .shadow(3.dp),
-                        color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.95f)
-                    ) {
-                        Text(
-                            text = "Q${house.price}",
-                            style = MaterialTheme.typography.labelMedium.copy(
-                                fontWeight = FontWeight.Bold, fontSize = 13.sp
-                            ),
-                            color = MaterialTheme.colorScheme.onSecondary,
-                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
-                        )
-                    }
-                }
-            }
-
-            // Información de la propiedad
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(0.4f)
-                    .padding(14.dp)
-            ) {
-                Text(
-                    text = house.title ?: "Sin título",
-                    style = MaterialTheme.typography.bodyLarge.copy(
-                        fontWeight = FontWeight.SemiBold
-                    ),
-                    color = MaterialTheme.colorScheme.onSurface,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-
-                Spacer(modifier = Modifier.height(6.dp))
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.LocationOn,
-                        contentDescription = "Ubicación",
-                        tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f),
-                        modifier = Modifier.size(14.dp)
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(
-                        text = house.address ?: "Ubicación no disponible",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                // Descripción breve
-                Text(
-                    text = house.description?.take(60)?.plus("...") ?: "Sin descripción disponible",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                    lineHeight = 16.sp
-                )
             }
         }
     }

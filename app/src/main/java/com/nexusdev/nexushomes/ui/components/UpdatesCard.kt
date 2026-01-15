@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Done
@@ -69,12 +70,22 @@ fun UpdatesCard(
             Text("Precio/Renta: " + house.price.toString())
             Spacer(modifier = Modifier.height(16.dp))
             Button(
-                onClick = {},
-                modifier = Modifier.fillMaxWidth()
+                onClick = { viewModel.toggleHouseStatus(house) },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (house.status == "Activo") Color.Red
+                    else MaterialTheme.colorScheme.primary
+                )
             ) {
                 Icon(
                     imageVector = Icons.Default.Done,
-                    contentDescription = "Done"
+                    contentDescription = "Estado",
+                    tint = Color.White
+                )
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    if (house.status != "Activo") "Marcar como Activo" else "Marcar como Inactivo",
+                    color = Color.White
                 )
             }
             Spacer(modifier = Modifier.height(16.dp))
@@ -83,21 +94,15 @@ fun UpdatesCard(
                 horizontalArrangement = Arrangement.SpaceAround
             ) {
                 Button(
-                    onClick = {}
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Edit,
-                        contentDescription = "Editar"
-                    )
-                }
-                Button(
                     onClick = {
                         showDialog = true
-                    }
+                    },
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     Icon(
                         imageVector = Icons.Default.Delete,
-                        contentDescription = "Delete"
+                        contentDescription = "Delete",
+                        tint = Color.White
                     )
                 }
             }

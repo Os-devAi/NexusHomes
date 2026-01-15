@@ -19,7 +19,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
-import com.nexusdev.nexushomes.ui.components.HouseCard
 import com.nexusdev.nexushomes.ui.components.UpdatesCard
 import com.nexusdev.nexushomes.ui.viewmodel.HomeDataViewModel
 

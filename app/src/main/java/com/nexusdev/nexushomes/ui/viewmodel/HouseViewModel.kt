@@ -94,11 +94,9 @@ class HomeDataViewModel : ViewModel() {
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                // Actualiza el documento en Firestore
                 homesCollection.document(houseId).set(house).await()
                 _message.value = "Propiedad actualizada con éxito"
 
-                // Opcional: Refrescar la lista localmente
                 _houses.value = _houses.value.map { if (it.id == houseId) house else it }
             } catch (e: Exception) {
                 _message.value = "Error al actualizar: ${e.localizedMessage}"
@@ -112,10 +110,7 @@ class HomeDataViewModel : ViewModel() {
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                // Elimina de Firestore
                 homesCollection.document(houseId).delete().await()
-
-                // Actualiza el estado local para reflejar la eliminación de inmediato
                 _houses.value = _houses.value.filter { it.id != houseId }
 
                 _message.value = "Propiedad eliminada correctamente"
@@ -127,4 +122,26 @@ class HomeDataViewModel : ViewModel() {
         }
     }
 
+    // funcion para cambiar de activo a inactivo y viseversa
+    fun toggleHouseStatus(house: HouseModel) {
+        val houseId = house.id ?: return
+        val newStatus = if (house.status == "Activo") "Inactivo" else "Activo"
+
+        viewModelScope.launch {
+            _isLoading.value = true
+            try {
+                homesCollection.document(houseId).update("status", newStatus).await()
+
+                _message.value = "Estado actualizado a $newStatus"
+
+                _houses.value = _houses.value.map {
+                    if (it.id == houseId) it.copy(status = newStatus) else it
+                }
+            } catch (e: Exception) {
+                _message.value = "Error al cambiar estado: ${e.localizedMessage}"
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
 }
