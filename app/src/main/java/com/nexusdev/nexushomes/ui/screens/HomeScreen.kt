@@ -13,6 +13,8 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.LocationOn
@@ -25,6 +27,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -80,20 +83,33 @@ fun HomeScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    if (user != null) navController.navigate("profile") else navController.navigate("login")
+                    if (user != null) navController.navigate("profile") else navController.navigate(
+                        "login"
+                    )
                 },
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary,
                 shape = CircleShape,
-                modifier = Modifier.size(64.dp).shadow(12.dp, shape = CircleShape)
+                modifier = Modifier
+                    .size(64.dp)
+                    .shadow(12.dp, shape = CircleShape)
             ) {
-                Icon(imageVector = Icons.Filled.Add, contentDescription = "Add", modifier = Modifier.size(28.dp))
+                Icon(
+                    imageVector = Icons.Filled.Add,
+                    contentDescription = "Add",
+                    modifier = Modifier.size(28.dp)
+                )
             }
         }
     ) { paddingValues ->
         Crossfade(targetState = isLoading, label = "Loading transition") { loading ->
             if (loading) {
-                Box(Modifier.fillMaxSize().padding(paddingValues), contentAlignment = Alignment.Center) {
+                Box(
+                    Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    contentAlignment = Alignment.Center
+                ) {
                     CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
                 }
             } else {
@@ -154,12 +170,19 @@ fun HomeHeader() {
             Image(
                 painter = painterResource(R.drawable.play_store_),
                 contentDescription = "Logo",
-                modifier = Modifier.size(28.dp).clip(CircleShape)
+                modifier = Modifier
+                    .size(28.dp)
+                    .clip(CircleShape)
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
                 buildAnnotatedString {
-                    withStyle(SpanStyle(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)) { append("Nexus") }
+                    withStyle(
+                        SpanStyle(
+                            color = MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.Bold
+                        )
+                    ) { append("Nexus") }
                     append("Homes")
                 },
                 style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold)
@@ -176,12 +199,22 @@ fun HomeHeader() {
 @Composable
 fun PropertyCountBadge(count: Int) {
     Surface(
-        modifier = Modifier.padding(horizontal = 20.dp).fillMaxWidth().clip(RoundedCornerShape(12.dp)),
+        modifier = Modifier
+            .padding(horizontal = 20.dp)
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp)),
         color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
     ) {
-        Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
+        Row(
+            Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
             Column {
-                Text("$count propiedades", style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold))
+                Text(
+                    "$count propiedades",
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold)
+                )
                 Text("Disponibles para ti", style = MaterialTheme.typography.bodySmall)
             }
             BadgedBox(badge = { Badge { Text(count.toString()) } }) {
@@ -193,39 +226,50 @@ fun PropertyCountBadge(count: Int) {
 
 @Composable
 fun SearchSection(query: String, onValueChange: (String) -> Unit) {
-    Card(
-        modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth().shadow(6.dp, RoundedCornerShape(16.dp)),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        shape = RoundedCornerShape(16.dp)
-    ) {
-        Row(Modifier.padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
-            Icon(Icons.Filled.Search, null, tint = MaterialTheme.colorScheme.primary)
-            Spacer(Modifier.width(12.dp))
-            OutlinedTextField(
-                value = query,
-                onValueChange = onValueChange,
-                placeholder = { Text("Buscar propiedades...") },
-                modifier = Modifier.weight(1f).height(50.dp),
-                shape = RoundedCornerShape(12.dp),
-                singleLine = true
-            )
-        }
+
+    Row(Modifier.padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
+        Icon(Icons.Filled.Search, null, tint = MaterialTheme.colorScheme.primary)
+        Spacer(Modifier.width(12.dp))
+
+        val keyboardController = LocalSoftwareKeyboardController.current
+        OutlinedTextField(
+            value = query,
+            onValueChange = onValueChange,
+            label = { Text("Buscar propiedades...") },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true,
+            shape = RoundedCornerShape(12.dp),
+            keyboardOptions = KeyboardOptions.Default.copy(
+                imeAction = androidx.compose.ui.text.input.ImeAction.Search
+            ),
+            keyboardActions = KeyboardActions(
+                onSearch = {
+                    keyboardController?.hide()
+                })
+        )
     }
 }
 
 @Composable
 fun FilterSection(selected: Int, onSelect: (Int) -> Unit) {
     Column(modifier = Modifier.padding(horizontal = 20.dp)) {
-        Text("Filtrar por tipo", style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold))
+        Text(
+            "Filtrar por tipo",
+            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold)
+        )
         Spacer(modifier = Modifier.height(12.dp))
         Row(
-            modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+            modifier = Modifier
+                .fillMaxWidth()
+                .horizontalScroll(rememberScrollState()),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             val types = listOf("Todas", "Casas", "Cuartos", "Apartamentos")
             types.forEachIndexed { index, type ->
                 Surface(
-                    modifier = Modifier.clip(RoundedCornerShape(16.dp)).clickable { onSelect(index) },
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(16.dp))
+                        .clickable { onSelect(index) },
                     color = if (selected == index) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
                 ) {
                     Text(
@@ -244,11 +288,22 @@ fun FilterSection(selected: Int, onSelect: (Int) -> Unit) {
 @Composable
 fun EmptyState(query: String) {
     Column(
-        modifier = Modifier.fillMaxWidth().padding(32.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(32.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Icon(Icons.Filled.Search, null, modifier = Modifier.size(80.dp), tint = Color.Gray.copy(alpha = 0.5f))
-        Text("No hay resultados para '$query'", textAlign = TextAlign.Center, fontWeight = FontWeight.Bold)
+        Icon(
+            Icons.Filled.Search,
+            null,
+            modifier = Modifier.size(80.dp),
+            tint = Color.Gray.copy(alpha = 0.5f)
+        )
+        Text(
+            "No hay resultados para '$query'",
+            textAlign = TextAlign.Center,
+            fontWeight = FontWeight.Bold
+        )
     }
 }
