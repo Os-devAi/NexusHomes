@@ -120,7 +120,7 @@ fun HomeScreen(
                         .padding()
                         .background(MaterialTheme.colorScheme.background),
                     contentPadding = PaddingValues(bottom = 80.dp), // Espacio para que el FAB no tape nada
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     item(span = { GridItemSpan(2) }) {
@@ -148,7 +148,7 @@ fun HomeScreen(
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(horizontal = 16.dp)
+                                    .padding(horizontal = 12.dp)
                             ) {
                                 ModernHouseCard(
                                     house = house,
