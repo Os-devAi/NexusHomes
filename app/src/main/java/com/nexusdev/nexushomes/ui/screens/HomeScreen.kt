@@ -51,6 +51,9 @@ fun HomeScreen(
     val firebaseAuth = FirebaseAuth.getInstance()
     val user = firebaseAuth.currentUser
 
+
+    // use this version for production
+
     // Estados
     val houses by viewModel.houses.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
